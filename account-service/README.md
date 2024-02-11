@@ -2,33 +2,32 @@
 
 ### Сущности
 
-#### deposits_clients
-- Id_client
-- number_deposit
-- amount
-- opening_date
-- closing_date
+#### account_type
+- depositId;
+- accountName;
+- interestRate;
+- replenishmentOption;
+- withdrawalOption;
+- type;
+- depositsClients;
 
-#### accounts_clients
-- id_client
-- number_account
-- amount
-- opening_date
+#### account_client
+- numberAccount;
+- balance;
+- openingDate;
+- closedDate;
+- status;
+- accountType;
 
-#### Deposit_type
-- содержит информацию о доступных вкладах
+
 
 ### Контроллеры
 
-#### Path:
-- /deposits
-- /accounts
+#### AccountInfoController
+- Отвечает за базовое отображение информации не авторизированным пользователям 
 
-#### DepositsController
-- Отвечает за операции с вкладами
-
-#### AccountsController
-- Отвечает за операции со счетами
+#### PersonalAccountController
+- Отвечает за отображение информации у авторизированного пользователя 
 
 ### User Story
 
