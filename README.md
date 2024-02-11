@@ -12,7 +12,9 @@
 * Back for Front
     * REST API (можно и GraphQL)
     * Без состояния
- * JavaScript App (front)
+ * JavaScript App (front) -
+
+ * Open API (Swagger)
 
 ## Не функциональные требования
 1. Spring Boot
