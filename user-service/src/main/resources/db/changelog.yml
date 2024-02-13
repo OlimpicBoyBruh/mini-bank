@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - includeAll:
+      path: db/tables
+  - includeAll:
+      path: db/constraints
