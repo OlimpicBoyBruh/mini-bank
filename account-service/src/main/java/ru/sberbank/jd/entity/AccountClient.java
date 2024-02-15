@@ -1,10 +1,11 @@
 package ru.sberbank.jd.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +23,7 @@ public class AccountClient {
     private LocalDateTime openingDate;
     private LocalDateTime closedDate;
     private String status;
+    private String type;
     @ManyToOne(fetch = FetchType.EAGER)
     private AccountType accountType;
 }
