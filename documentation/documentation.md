@@ -17,4 +17,4 @@ git pull
 4. После утверждения pull-реквеста выполняется слияние feature-ветки в `develop`
 
 ## Описание сервиса счетов
-[Документация по сервису](../account-service/README.md)
+[Документация по сервису](../account-service/account-service.md)

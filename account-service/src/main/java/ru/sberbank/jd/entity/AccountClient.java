@@ -1,11 +1,12 @@
 package ru.sberbank.jd.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
-
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,9 +1,10 @@
 package ru.sberbank.jd.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import java.util.List;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +23,6 @@ public class AccountType {
     private boolean withdrawalOption;
     private String type;
     @JsonIgnore
-    @ManyToMany(mappedBy = "accountType")
+    @OneToMany(mappedBy = "accountType")
     private List<AccountClient> accountClients;
 }

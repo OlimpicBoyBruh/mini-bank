@@ -1,15 +1,13 @@
 package ru.sberbank.jd.repository;
 
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.sberbank.jd.controller.dto.AccountNumbers;
 import ru.sberbank.jd.entity.AccountClient;
 
 /**
@@ -38,6 +36,7 @@ public interface AccountClientRepository extends JpaRepository<AccountClient, St
     List<AccountClient> getClientDeposits(@Param("clientId") String clientId);
 
     List<AccountClient> findByNumberAccountIn(List<String> accountNumbers);
+
     @Transactional
     @Modifying
     @Query(value = "update account_client set status ='CLOSED', closed_date= :closedDate " +
@@ -46,7 +45,7 @@ public interface AccountClientRepository extends JpaRepository<AccountClient, St
 
     @Transactional
     @Modifying
-    @Query(value = "update account_client set balance = balance + :change " +
-            "where number_account = :numberAccount", nativeQuery = true)
-    void changeBalance(@Param("change") double change,@Param("numberAccount") String numberAccount);
+    @Query(value = "update account_client set balance = balance + :change "
+            + "where number_account = :numberAccount", nativeQuery = true)
+    void changeBalance(@Param("change") double change, @Param("numberAccount") String numberAccount);
 }
