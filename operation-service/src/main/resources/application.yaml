@@ -18,8 +18,15 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
 
 springdoc:
   swagger-ui:
     path: /open_api.html
+
+integration:
+  account-service:
+    url: http://localhost:8190/profile
+    connect-timeout: 5000
+    read-timeout: 10000
+    write-timeout: 5000

@@ -1,4 +1,4 @@
-package ru.sberbank.jd;
+package ru.sberbank.api;
 
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
