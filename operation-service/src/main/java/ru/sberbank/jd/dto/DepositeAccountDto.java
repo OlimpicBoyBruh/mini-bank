@@ -16,12 +16,11 @@ public class DepositeAccountDto {
     private String depositeAccount;
     private String returnAccount;
     private BigDecimal amount;
-    private BigDecimal depositeRate;
+    private double depositeRate;
 
     private String description;
 
     private LocalDateTime openingDate;
     private LocalDateTime closedDate;
-
 
 }

@@ -1,5 +1,6 @@
 package ru.sberbank.jd.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.sberbank.jd.converters.OperationConverter;
@@ -19,24 +20,28 @@ public class OperationController {
     private final OperationService operationService;
 
     @PostMapping()
-    public void doTransfer(@RequestBody OperationTransferDto transferDto) {
-
+    public void doTransfer(@RequestBody OperationTransferDto transferDto,
+                           @RequestHeader(name = "user-id") String userId) {
+        operationService.doTransferOperation(transferDto, userId);
     }
 
     @PostMapping("/depo_close")
-    public void closeDepositeAccount(@RequestBody DepositeAccountDto depositeAccountDto) {
+    public void closeDepositeAccount(@RequestBody DepositeAccountDto depositeAccountDto,
+                                     @RequestHeader(name = "user-id") String userId) {
 
     }
 
     @GetMapping("/{id}")
-    public OperationTransferDto findOperationById(@PathVariable Long id) {
-        return OperationConverter.entityToDto(operationService.findById(id)
+    public OperationTransferDto findOperationById(@PathVariable Long id,
+                                                  @RequestHeader(name = "user-id") String userId) {
+        return OperationConverter.entityToDto(operationService.findById(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Операция с id " + id + " не найдена")));
     }
 
     @GetMapping("/history/{account}")
-    public List<OperationTransferDto> findOperationByAccount(@PathVariable Long account) {
-        return operationService.findOperationByAccount(account).stream()
+    public List<OperationTransferDto> findOperationByAccount(@PathVariable String account,
+                                                             @RequestHeader(name = "user-id") String userId) {
+        return operationService.findOperationByAccount(account, userId).stream()
                 .map(OperationConverter::entityToDto)
                 .collect(Collectors.toList());
     }
