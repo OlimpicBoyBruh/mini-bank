@@ -2,13 +2,13 @@ package ru.sberbank.jd.entity;
 
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
+import ru.sberbank.jd.model.Status;
+import ru.sberbank.jd.model.Type;
 
 /**
  * Entity объект Бд account_client.
@@ -23,8 +23,10 @@ public class AccountClient {
     private double balance;
     private LocalDateTime openingDate;
     private LocalDateTime closedDate;
-    private String status;
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private Status status;
+    @Enumerated(EnumType.STRING)
+    private Type type;
     @ManyToOne(fetch = FetchType.EAGER)
     private AccountType accountType;
 }

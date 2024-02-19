@@ -1,4 +1,4 @@
-package ru.sberbank.jd.controller.dto;
+package ru.sberbank.jd.model.dto;
 
 import java.util.List;
 import lombok.Getter;

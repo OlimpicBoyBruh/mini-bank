@@ -21,7 +21,7 @@ public interface AccountClientRepository extends JpaRepository<AccountClient, St
      * @param clientId идентификатор клиента
      * @return все счета клиента.
      */
-    @Query(value = "select * from account_client where id_client = :clientId and type = 'Account'",
+    @Query(value = "select * from account_client where id_client = :clientId and type = 'ACCOUNT' and status= 'ACTIVE'",
             nativeQuery = true)
     List<AccountClient> getClientAccounts(@Param("clientId") String clientId);
 
@@ -31,7 +31,7 @@ public interface AccountClientRepository extends JpaRepository<AccountClient, St
      * @param clientId идентификатор клиента
      * @return все счета клиента.
      */
-    @Query(value = "select * from account_client where id_client = :clientId and type = 'Deposit'",
+    @Query(value = "select * from account_client where id_client = :clientId and type = 'DEPOSIT' and status= 'ACTIVE'",
             nativeQuery = true)
     List<AccountClient> getClientDeposits(@Param("clientId") String clientId);
 
