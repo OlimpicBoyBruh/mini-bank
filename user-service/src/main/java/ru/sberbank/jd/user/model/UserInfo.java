@@ -36,10 +36,12 @@ public class UserInfo {
     private String lastName;
     @Column(name = "email")
     private String email;
-    @Column(name = "phone")
+    @Column(name = "phone_entered")
     private String phone;
     @Column(name = "birth_date")
     private LocalDate birthDate;
+    @Column(name = "phone_normalized")
+    private String phoneNormalized;
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;

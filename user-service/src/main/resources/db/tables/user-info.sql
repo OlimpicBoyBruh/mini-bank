@@ -7,7 +7,8 @@ CREATE TABLE user_info (
   last_name VARCHAR(255),
   birth_date DATE,
   email VARCHAR(255),
-  phone VARCHAR(20),
+  phone_entered VARCHAR(30),
+  phone_normalized VARCHAR(30),
   created_at TIMESTAMP(6),
   updated_at TIMESTAMP(6),
   PRIMARY KEY(id)

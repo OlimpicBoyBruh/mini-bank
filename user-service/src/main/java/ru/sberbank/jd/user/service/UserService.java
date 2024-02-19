@@ -1,10 +1,13 @@
 package ru.sberbank.jd.user.service;
 
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.sberbank.jd.UserInfoDto;
 import ru.sberbank.jd.user.model.UserInfo;
-import ru.sberbank.jd.user.model.dto.UserInfoDto;
+import ru.sberbank.jd.user.model.dto.UserCreateDto;
+import ru.sberbank.jd.user.model.dto.UserUpdateDto;
 import ru.sberbank.jd.user.repository.UserRepository;
 
 /**
@@ -15,60 +18,61 @@ import ru.sberbank.jd.user.repository.UserRepository;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserInfoMapping userInfoMapping;
+    private final UserInfoChecks userInfoChecks;
 
-    public UserInfoDto createUser(UserInfoDto dto) {
-        UserInfo user = mapDtoToInfo(dto);
-        userRepository.save(user);
+    public UserInfoDto createUser(UserCreateDto dto) {
+        UserInfo user = userInfoMapping.mapDtoToInfo(dto);
 
-        return dto;
+        checkUser(user);
+        userInfoChecks.checkBirthDate(user.getBirthDate());
+        user = userRepository.save(userInfoMapping.mapDtoToInfo(dto));
+
+        return userInfoMapping.mapInfoToDto(user);
     }
 
-    public UserInfoDto getInfo(UUID id) {
-        UserInfo user = userRepository.findById(id).orElseThrow();
+    public UserInfoDto getInfo(UUID userId) {
+        UserInfo user = findUser(userId);
 
-        return mapInfoToDto(user);
+        return userInfoMapping.mapInfoToDto(user);
     }
 
-    public UserInfoDto deleteInfo(String email) {
-        UserInfo user = userRepository.findByEmail(email);
+    public UserInfoDto deleteInfo(UUID userId) {
+        UserInfo user = findUser(userId);
+
         userRepository.delete(user);
 
-        return mapInfoToDto(user);
+        return userInfoMapping.mapInfoToDto(user);
     }
 
-    public UserInfo updateInfo(UserInfoDto dto) {
-        UserInfo user = userRepository.findByEmail(dto.getEmail());
+    public UserInfoDto updateInfo(UUID userId, UserUpdateDto dto) {
+        UserInfo user = findUser(userId);
 
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setEmail(dto.getEmail());
-        user.setPhone(dto.getPhone());
-        user.setBirthDate(dto.getBirthDate());
+        userInfoMapping.mapDtoToInfo(user, dto);
+        checkUser(user);
+        userRepository.save(user);
 
-        return userRepository.save(user);
+        return userInfoMapping.mapInfoToDto(user);
     }
 
-    private UserInfoDto mapInfoToDto(UserInfo user) {
-        UserInfoDto dto = new UserInfoDto();
+    private void checkUser(UserInfo user) {
+        userInfoChecks.checkPhone(user.getPhone());
+        userInfoChecks.checkEmail(user.getEmail());
 
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setEmail(user.getEmail());
-        dto.setPhone(user.getPhone());
-        dto.setBirthDate(user.getBirthDate());
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            throw new IllegalArgumentException(
+                    String.format("User with email %1$s already exists", user.getEmail()));
+        }
 
-        return dto;
+        if (userRepository.findByPhoneNormalized(user.getPhoneNormalized()) != null) {
+            throw new IllegalArgumentException(
+                    String.format("User with phone %1$s already exists", user.getPhone()));
+        }
     }
 
-    private UserInfo mapDtoToInfo(UserInfoDto dto) {
-        UserInfo user = new UserInfo();
-
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setEmail(dto.getEmail());
-        user.setPhone(dto.getPhone());
-        user.setBirthDate(dto.getBirthDate());
-
-        return user;
+    private UserInfo findUser(UUID userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new NoSuchElementException(
+                        String.format("User with id %1$s doesn't exist", userId)));
     }
 }
