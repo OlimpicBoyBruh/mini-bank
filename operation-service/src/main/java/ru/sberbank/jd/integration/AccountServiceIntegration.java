@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import ru.sberbank.api.AccountDto;
@@ -16,7 +15,6 @@ import ru.sberbank.jd.properties.AccountServiceIntegrationProperties;
 
 import java.rmi.ServerException;
 import java.rmi.server.ServerNotActiveException;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
