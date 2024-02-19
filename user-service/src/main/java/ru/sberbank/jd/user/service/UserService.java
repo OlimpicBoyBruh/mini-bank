@@ -26,7 +26,7 @@ public class UserService {
 
         checkUser(user);
         userInfoChecks.checkBirthDate(user.getBirthDate());
-        user = userRepository.save(userInfoMapping.mapDtoToInfo(dto));
+        user = userRepository.save(user);
 
         return userInfoMapping.mapInfoToDto(user);
     }

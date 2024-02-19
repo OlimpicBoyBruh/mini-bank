@@ -1,14 +1,14 @@
 package ru.sberbank.jd.user.model;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
  * Error message in response.
  */
-@Data
 @RequiredArgsConstructor
 public class ErrorResponse {
 
+    @Getter
     private final String message;
 }
