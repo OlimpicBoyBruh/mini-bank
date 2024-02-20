@@ -42,6 +42,7 @@ public class OperationController {
     @PostMapping("/depo_close")
     public void closeDepositeAccount(@RequestBody DepositeAccountDto depositeAccountDto,
                                      @RequestHeader(name = "user-id") String userId) {
+        operationService.closeDepositeAccount(depositeAccountDto,userId);
 
     }
 
