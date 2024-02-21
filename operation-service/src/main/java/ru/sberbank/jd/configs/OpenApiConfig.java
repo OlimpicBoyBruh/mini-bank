@@ -12,7 +12,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(
                         new Info()
-                                .title("operation-service - Сервис переводов")
+                                .title("operation-service - Сервис операций по счетам")
                                 .version("1")
                 );
     }

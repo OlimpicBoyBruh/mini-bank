@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Schema(description = "Информации о счете")
 public class AccountDto {
-    @Schema(description = "Номер счета", required = true, example = "14010348627281")
+    @Schema(description = "Номер счета", required = true, example = "40801810123450000001")
     private String numberAccount;
 
     @DecimalMin(value = "0.0")

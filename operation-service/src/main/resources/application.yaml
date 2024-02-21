@@ -20,10 +20,6 @@ spring:
     hibernate:
       ddl-auto: validate
 
-springdoc:
-  swagger-ui:
-    path: /open_api.html
-
 integration:
   account-service:
     url: http://localhost:8190/profile

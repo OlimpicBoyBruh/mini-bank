@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.sberbank.jd.converters.OperationConverter;
 import ru.sberbank.jd.dto.DepositeAccountDto;
 import ru.sberbank.jd.dto.OperationTransferDto;
-import ru.sberbank.jd.exceptions.ResourceNotFoundException;
 import ru.sberbank.jd.services.OperationService;
 
 import java.util.List;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/operation")
 @RequiredArgsConstructor
-//@CrossOrigin("*")
+@CrossOrigin("*")
 @Tag(name = "Контроллер операций по счетам", description = "Выполняет переводы и хранит историю")
 public class OperationController {
     private final OperationService operationService;
@@ -42,7 +41,7 @@ public class OperationController {
     @PostMapping("/depo_close")
     public void closeDepositeAccount(@RequestBody DepositeAccountDto depositeAccountDto,
                                      @RequestHeader(name = "user-id") String userId) {
-        operationService.closeDepositeAccount(depositeAccountDto,userId);
+        operationService.closeDepositeAccount(depositeAccountDto, userId);
 
     }
 
@@ -58,8 +57,7 @@ public class OperationController {
     @GetMapping("/{id}")
     public OperationTransferDto findOperationById(@PathVariable @Parameter(description = "ID операции", required = true) Long id,
                                                   @RequestHeader(name = "user-id") @Parameter(description = "ID пользователя") String userId) {
-        return OperationConverter.entityToDto(operationService.findById(id, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Операция с id " + id + " не найдена")));
+        return OperationConverter.entityToDto(operationService.findById(id, userId));
     }
 
     @Operation(
@@ -78,5 +76,4 @@ public class OperationController {
                 .map(OperationConverter::entityToDto)
                 .collect(Collectors.toList());
     }
-
 }
