@@ -42,7 +42,7 @@ public class OperationController {
     @PostMapping("/depo_close")
     public void closeDepositeAccount(@RequestBody DepositeAccountDto depositeAccountDto,
                                      @RequestHeader(name = "user-id") String userId) {
-        operationService.closeDepositeAccount(depositeAccountDto,userId);
+        operationService.closeDepositeAccount(depositeAccountDto, userId);
 
     }
 
@@ -58,8 +58,7 @@ public class OperationController {
     @GetMapping("/{id}")
     public OperationTransferDto findOperationById(@PathVariable @Parameter(description = "ID операции", required = true) Long id,
                                                   @RequestHeader(name = "user-id") @Parameter(description = "ID пользователя") String userId) {
-        return OperationConverter.entityToDto(operationService.findById(id, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Операция с id " + id + " не найдена")));
+        return OperationConverter.entityToDto(operationService.findById(id, userId));
     }
 
     @Operation(

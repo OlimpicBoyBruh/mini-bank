@@ -18,10 +18,10 @@ public class OperationTransferDto {
     @Schema(description = "Номер операции", required = true)
     private Long id;
 
-    @Schema(description = "Номер счета списания средств", required = true, example = "14010348627281")
+    @Schema(description = "Номер счета списания средств", required = true, example = "40801810123450000001")
     private String debitAccount;
 
-    @Schema(description = "Номер счета пополнения средств", required = true, example = "14010348627281")
+    @Schema(description = "Номер счета пополнения средств", required = true, example = "40801810123450000001")
     private String creditAccount;
 
     @Schema(description = "Назначение операции", required = true, example = "Пополнение счета")

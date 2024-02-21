@@ -35,4 +35,11 @@ public class Operation {
     @Column(name = "updated_at")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public Operation(String debitAccount, String creditAccount, String description, BigDecimal amount) {
+        this.debitAccount = debitAccount;
+        this.creditAccount = creditAccount;
+        this.description = description;
+        this.amount = amount;
+    }
 }
