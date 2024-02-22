@@ -1,0 +1,22 @@
+name: mini-bank
+
+services:
+
+  db-service:
+    image: "postgres:13.8-alpine"
+    container_name: "database"
+    restart: always
+
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+
+    ports:
+      - 32032:5432
+
+include:
+  - path:
+    - user-service/compose.yaml
+    - account-service/compose.yaml
+    - operation-service/compose.yaml
