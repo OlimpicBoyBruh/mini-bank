@@ -1,0 +1,17 @@
+services:
+  account-service:
+    build: .
+    container_name: "account-service"
+
+    ports:
+      - 8190:8190
+
+    environment:
+      - SPRING_DATASOURCE_URL=${DB_URL}
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+
+    depends_on:
+      db-service:
+        condition: service_started
+        required: true

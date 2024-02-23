@@ -2,7 +2,6 @@ services:
   user-service:
     build: .
     container_name: "user-service"
-    restart: always
 
     ports:
       - 32081:8080
