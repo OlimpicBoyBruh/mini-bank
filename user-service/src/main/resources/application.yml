@@ -1,6 +1,9 @@
+server:
+  post: 8080
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/users
+    url: jdbc:postgresql://localhost/users
     username: test
     password: test
 
