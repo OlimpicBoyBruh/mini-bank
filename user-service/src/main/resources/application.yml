@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/users
+    username: test
+    password: test
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    changelog: "classpath:db/changelog.yml"
+    defaultSchema: "user_service"
+
+springdoc:
+  swagger-ui:
+    path: "/swagger"
+    disable-swagger-default-url: true
+    use-root-path: true
