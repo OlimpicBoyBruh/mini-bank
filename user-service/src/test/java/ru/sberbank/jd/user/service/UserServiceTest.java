@@ -9,7 +9,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import ru.sberbank.jd.UserInfoDto;
+import ru.sberbank.api.UserInfoDto;
 import ru.sberbank.jd.user.model.UserInfo;
 import ru.sberbank.jd.user.repository.UserRepository;
 

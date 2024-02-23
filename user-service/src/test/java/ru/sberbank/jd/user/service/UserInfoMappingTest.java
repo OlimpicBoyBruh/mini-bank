@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.sberbank.jd.UserInfoDto;
+import ru.sberbank.api.UserInfoDto;
 import ru.sberbank.jd.user.model.UserInfo;
 import ru.sberbank.jd.user.model.dto.UserCreateDto;
 import ru.sberbank.jd.user.model.dto.UserUpdateDto;

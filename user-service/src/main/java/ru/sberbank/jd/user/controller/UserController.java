@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.sberbank.jd.UserInfoDto;
+import ru.sberbank.api.UserInfoDto;
 import ru.sberbank.jd.user.model.ErrorResponse;
 import ru.sberbank.jd.user.model.dto.UserCreateDto;
 import ru.sberbank.jd.user.model.dto.UserUpdateDto;

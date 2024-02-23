@@ -2,7 +2,7 @@ package ru.sberbank.jd.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.sberbank.jd.UserInfoDto;
+import ru.sberbank.api.UserInfoDto;
 import ru.sberbank.jd.user.model.UserInfo;
 import ru.sberbank.jd.user.model.dto.UserCreateDto;
 import ru.sberbank.jd.user.model.dto.UserUpdateDto;

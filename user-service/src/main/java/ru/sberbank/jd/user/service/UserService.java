@@ -4,7 +4,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.sberbank.jd.UserInfoDto;
+import ru.sberbank.api.UserInfoDto;
 import ru.sberbank.jd.user.model.UserInfo;
 import ru.sberbank.jd.user.model.dto.UserCreateDto;
 import ru.sberbank.jd.user.model.dto.UserUpdateDto;
