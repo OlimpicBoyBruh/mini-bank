@@ -2,7 +2,7 @@ services:
   user-service:
     build: .
     container_name: "user-service"
-    restart: always
+    image: "mini-bank-user-service"
 
     ports:
       - 32081:8080
