@@ -21,7 +21,7 @@ spring:
       ddl-auto: validate
 
 integration:
-  account-service:
+  account.service:
     url: http://localhost:8190/profile
     connect-timeout: 5000
     read-timeout: 10000

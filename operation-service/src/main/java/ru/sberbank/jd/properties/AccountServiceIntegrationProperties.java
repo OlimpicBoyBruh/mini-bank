@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 //@ConstructorBinding
-@ConfigurationProperties(prefix = "integration.account-service")
+@ConfigurationProperties(prefix = "integration.account.service")
 @ConfigurationPropertiesScan
 @Data
 public class AccountServiceIntegrationProperties {
