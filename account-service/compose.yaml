@@ -2,6 +2,7 @@ services:
   account-service:
     build: .
     container_name: "account-service"
+    image: "mini-bank-account-service"
 
     ports:
       - 8190:8190

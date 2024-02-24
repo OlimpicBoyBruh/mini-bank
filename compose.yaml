@@ -16,7 +16,6 @@ services:
       - 32032:5432
 
 include:
-  - path:
-    - user-service/compose.yaml
-    - account-service/compose.yaml
-    - operation-service/compose.yaml
+  - path: user-service/compose.yaml
+  - path: account-service/compose.yaml
+  - path: operation-service/compose.yaml
