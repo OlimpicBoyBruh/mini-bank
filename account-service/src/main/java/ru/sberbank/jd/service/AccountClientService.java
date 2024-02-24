@@ -9,11 +9,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.sberbank.api.account.service.dto.AccountDto;
 import ru.sberbank.jd.entity.AccountClient;
 import ru.sberbank.jd.entity.AccountType;
-import ru.sberbank.jd.model.Status;
-import ru.sberbank.jd.model.Type;
-import ru.sberbank.jd.model.dto.AccountDto;
+import ru.sberbank.api.account.service.Status;
+import ru.sberbank.api.account.service.Type;
 import ru.sberbank.jd.repository.AccountClientRepository;
 
 /**
@@ -22,6 +22,7 @@ import ru.sberbank.jd.repository.AccountClientRepository;
 @Service
 @AllArgsConstructor
 public class AccountClientService {
+
     private final AccountClientRepository clientRepository;
     private final AccountTypeService accountTypeService;
 
@@ -43,9 +44,10 @@ public class AccountClientService {
     public List<AccountClient> getAccounts(String clientId) {
         return clientRepository.getClientAccounts(clientId);
     }
+
     public AccountClient findByNumberAccount(String accountNumber) {
         return clientRepository.findById(accountNumber)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Счет не найден"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Счет не найден"));
     }
 
     public AccountClient changeBalance(double change, String numberAccount) {
@@ -53,10 +55,10 @@ public class AccountClientService {
         double amount = roundTwoDecimals(change);
 
         if (accountClient.getStatus().equals(Status.CLOSED)) {
-            throw  new ResponseStatusException(HttpStatus.FORBIDDEN,"Счет уже закрыт");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Счет уже закрыт");
         }
         if (accountClient.getBalance() + amount < 0) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"На балансе недостаточно средств");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "На балансе недостаточно средств");
         }
         clientRepository.changeBalance(amount, numberAccount);
         return findByNumberAccount(numberAccount);
@@ -75,6 +77,7 @@ public class AccountClientService {
     public List<AccountClient> getListAccount(List<String> accountNumbers) {
         return clientRepository.findByNumberAccountIn(accountNumbers);
     }
+
     public AccountDto getAccountInfo(String accountNumber) {
         Optional<AccountClient> check = clientRepository.findById(accountNumber);
         if (check.isEmpty()) {
@@ -82,23 +85,29 @@ public class AccountClientService {
         }
         AccountClient accountClient = check.get();
 
-        return new AccountDto(accountNumber,accountClient.getBalance(),
+        return new AccountDto(accountNumber, accountClient.getBalance(),
                 accountClient.getStatus().toString(), accountClient.getIdClient());
     }
+
     public void closedAccount(String accountNumber, String clientId) {
         AccountClient accountClient = findByNumberAccount(accountNumber);
         if (!accountClient.getIdClient().equals(clientId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Счет не найден");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Счет не найден");
         }
         if (accountClient.getStatus().equals(Status.CLOSED)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Счет уже закрыт");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Счет уже закрыт");
         }
         if (accountClient.getBalance() != 0) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Для закрытия счета, баланс должен быть равен 0");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Для закрытия счета, баланс должен быть равен 0");
         }
         clientRepository.closeAccount(LocalDateTime.now(), accountNumber);
     }
 
+    public double roundTwoDecimals(double d) {
+        DecimalFormat twoDForm = new DecimalFormat("#.##");
+        String formattedNumber = twoDForm.format(d).replace(",", ".");
+        return Double.valueOf(formattedNumber);
+    }
 
     private AccountClient createAccount(String clientId, String accountId) {
         AccountType accountType = accountTypeService.getAccount(accountId);
@@ -124,11 +133,5 @@ public class AccountClientService {
             number.append(random.nextInt(10));
         }
         return number.toString();
-    }
-
-    public double roundTwoDecimals(double d) {
-        DecimalFormat twoDForm = new DecimalFormat("#.##");
-        String formattedNumber = twoDForm.format(d).replace(",", ".");
-        return Double.valueOf(formattedNumber);
     }
 }

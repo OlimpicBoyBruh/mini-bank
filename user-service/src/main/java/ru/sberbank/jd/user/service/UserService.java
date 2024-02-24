@@ -1,14 +1,16 @@
 package ru.sberbank.jd.user.service;
 
+import jakarta.transaction.Transactional;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.sberbank.api.UserInfoDto;
+import ru.sberbank.api.user.service.dto.UserCreateDto;
+import ru.sberbank.api.user.service.dto.UserInfoDto;
+import ru.sberbank.api.user.service.dto.UserUpdateDto;
 import ru.sberbank.jd.user.model.UserInfo;
-import ru.sberbank.jd.user.model.dto.UserCreateDto;
-import ru.sberbank.jd.user.model.dto.UserUpdateDto;
 import ru.sberbank.jd.user.repository.UserRepository;
+import ru.sberbank.jd.user.service.client.AccountServiceClient;
 
 /**
  * Сервис данных пользователей.
@@ -20,9 +22,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserInfoMapping userInfoMapping;
     private final UserInfoChecks userInfoChecks;
+    private final AccountServiceClient accountClient;
 
+    @Transactional
     public UserInfoDto createUser(UserCreateDto dto) {
         UserInfo user = userInfoMapping.mapDtoToInfo(dto);
+
+        accountClient.open();
 
         checkUser(user);
         userInfoChecks.checkBirthDate(user.getBirthDate());
@@ -37,6 +43,7 @@ public class UserService {
         return userInfoMapping.mapInfoToDto(user);
     }
 
+    @Transactional
     public UserInfoDto deleteInfo(UUID userId) {
         UserInfo user = findUser(userId);
 
@@ -45,6 +52,7 @@ public class UserService {
         return userInfoMapping.mapInfoToDto(user);
     }
 
+    @Transactional
     public UserInfoDto updateInfo(UUID userId, UserUpdateDto dto) {
         UserInfo user = findUser(userId);
 

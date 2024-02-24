@@ -3,6 +3,7 @@
 ### Сущности
 
 #### account_type
+
 - depositId;
 - accountName;
 - interestRate;
@@ -12,6 +13,7 @@
 - depositsClients;
 
 #### account_client
+
 - numberAccount;
 - balance;
 - openingDate;
@@ -19,13 +21,11 @@
 - status;
 - accountType;
 
-
-
 ### Контроллеры
 
-
 #### ProfileController
-- Отвечает за отображение информации у авторизированного пользователя 
+
+- Отвечает за отображение информации у авторизированного пользователя
 
 ### User Story
 

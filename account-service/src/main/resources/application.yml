@@ -13,6 +13,7 @@ spring:
       hibernate.jdbc.time_zone: UTC
     hibernate:
       ddl-auto: validate
+      default_schema: "account_service"
   liquibase:
     defaultSchema: "account_service"
 springdoc:

@@ -15,6 +15,7 @@ import ru.sberbank.jd.repository.AccountTypeRepository;
 @Service
 @AllArgsConstructor
 public class AccountTypeService {
+
     private AccountTypeRepository accountTypeRepository;
 
     /**
@@ -29,7 +30,7 @@ public class AccountTypeService {
     public AccountType getAccount(String accountId) {
         Optional<AccountType> account = accountTypeRepository.findById(accountId);
         if (account.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Account not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found");
         }
         return account.get();
     }

@@ -1,4 +1,4 @@
-package ru.sberbank.api;
+package ru.sberbank.api.account.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Schema(description = "Информации о счете")
 public class AccountDto {
+
     @Schema(description = "Номер счета", required = true, example = "40801810123450000001")
     private String numberAccount;
 

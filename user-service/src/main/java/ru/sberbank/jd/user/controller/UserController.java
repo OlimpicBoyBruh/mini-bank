@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,10 +17,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.sberbank.api.UserInfoDto;
-import ru.sberbank.jd.user.model.ErrorResponse;
-import ru.sberbank.jd.user.model.dto.UserCreateDto;
-import ru.sberbank.jd.user.model.dto.UserUpdateDto;
+import ru.sberbank.api.user.service.dto.ErrorResponse;
+import ru.sberbank.api.user.service.dto.UserCreateDto;
+import ru.sberbank.api.user.service.dto.UserInfoDto;
+import ru.sberbank.api.user.service.dto.UserUpdateDto;
 
 /**
  * User controller description.
@@ -40,7 +41,7 @@ public interface UserController {
                             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
             }
     )
-    UserInfoDto create(@RequestBody UserCreateDto dto, HttpServletResponse response);
+    UserInfoDto create(@Valid @RequestBody UserCreateDto dto, HttpServletResponse response);
 
     @DeleteMapping
     @Operation(summary = "Delete registered user",
@@ -82,5 +83,5 @@ public interface UserController {
                     @ApiResponse(responseCode = "404", description = "User not found",
                             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})}
     )
-    UserInfoDto update(@RequestParam(name = "id") UUID userId, @RequestBody UserUpdateDto userInfo);
+    UserInfoDto update(@Valid @RequestParam(name = "id") UUID userId, @RequestBody UserUpdateDto userInfo);
 }

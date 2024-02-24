@@ -1,11 +1,10 @@
-package ru.sberbank.jd.dto;
+package ru.sberbank.api.operation.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor

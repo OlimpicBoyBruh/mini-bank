@@ -1,16 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>ru.sberbank.jd</groupId>
-        <artifactId>miniBank-JD-1023</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
 
     <artifactId>user-service</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <name>user-service</name>
+
     <packaging>jar</packaging>
 
-    <name>user-service</name>
+    <parent>
+        <artifactId>miniBank-JD-1023</artifactId>
+        <groupId>ru.sberbank.jd</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,42 +19,71 @@
     </properties>
 
     <dependencies>
+        <!--        spring starters-->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>org.springframework.boot</groupId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <groupId>org.springframework.boot</groupId>
         </dependency>
         <dependency>
+            <artifactId>spring-boot-starter-validation</artifactId>
             <groupId>org.springframework.boot</groupId>
+        </dependency>
+        <dependency>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <groupId>org.springframework.boot</groupId>
+        </dependency>
+        <dependency>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+            <groupId>org.springframework.boot</groupId>
+        </dependency>
+        <dependency>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <groupId>org.springdoc</groupId>
+        </dependency>
+        <dependency>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+            <groupId>org.springframework.boot</groupId>
+        </dependency>
+        <dependency>
+            <artifactId>preliquibase-spring-boot-starter</artifactId>
+            <groupId>net.lbruun.springboot</groupId>
+        </dependency>
+
+        <!--        spring tests-->
+        <dependency>
             <artifactId>spring-boot-starter-test</artifactId>
+            <groupId>org.springframework.boot</groupId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <groupId>org.springframework.security</groupId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <artifactId>lombok</artifactId>
+            <groupId>org.projectlombok</groupId>
         </dependency>
+
+        <!--        database-->
         <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <groupId>org.postgresql</groupId>
         </dependency>
         <dependency>
-            <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
+            <groupId>org.liquibase</groupId>
         </dependency>
+
+        <!--        local modules-->
         <dependency>
-            <groupId>net.lbruun.springboot</groupId>
-            <artifactId>preliquibase-spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ru.sberbank.jd</groupId>
             <artifactId>user-service-api</artifactId>
+            <groupId>ru.sberbank.jd</groupId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
@@ -61,13 +91,14 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
             </plugin>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.springframework.boot</groupId>
             </plugin>
         </plugins>
     </build>
+
 </project>

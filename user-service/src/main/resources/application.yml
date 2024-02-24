@@ -10,6 +10,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+      default_schema: "user_service"
     show-sql: true
     properties:
       hibernate:
@@ -24,3 +25,21 @@ springdoc:
     path: "/swagger"
     disable-swagger-default-url: true
     use-root-path: true
+
+jwt:
+  key:
+    public: "classpath:keys/public.key"
+    private: "classpath:keys/private.key"
+
+app:
+  account:
+    host: localhost
+    port: 8190
+    url: http://${app.account.host}:${app.account.port}/profile
+
+#debug: true
+#logging:
+#  level:
+#    root: DEBUG
+#    org.springframework.web: TRACE
+#    org.springframework.security: TRACE

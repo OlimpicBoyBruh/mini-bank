@@ -3,6 +3,8 @@ package ru.sberbank.jd.configs;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -12,15 +14,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import ru.sberbank.jd.properties.AccountServiceIntegrationProperties;
 
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
-
 @Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties(AccountServiceIntegrationProperties.class)
 public class AppConfig {
 
     private final AccountServiceIntegrationProperties properties;
+
     @Bean
     public WebClient.Builder webClient() {
         HttpClient httpClient = reactor.netty.http.client.HttpClient.create()
@@ -28,7 +28,8 @@ public class AppConfig {
                 .responseTimeout(Duration.ofMillis(properties.getConnectTimeout()))
                 .doOnConnected(conn ->
                         conn.addHandlerLast(new ReadTimeoutHandler(properties.getReadTimeout(), TimeUnit.MILLISECONDS))
-                                .addHandlerLast(new WriteTimeoutHandler(properties.getWriteTimeout(), TimeUnit.MILLISECONDS)));
+                                .addHandlerLast(
+                                        new WriteTimeoutHandler(properties.getWriteTimeout(), TimeUnit.MILLISECONDS)));
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient));
     }

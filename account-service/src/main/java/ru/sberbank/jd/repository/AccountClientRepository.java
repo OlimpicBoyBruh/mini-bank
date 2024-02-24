@@ -15,6 +15,7 @@ import ru.sberbank.jd.entity.AccountClient;
  */
 @Repository
 public interface AccountClientRepository extends JpaRepository<AccountClient, String> {
+
     /**
      * Возвращает все счета клиента.
      *

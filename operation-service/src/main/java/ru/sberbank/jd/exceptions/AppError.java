@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Schema(description = "Сообщения ошибок сервисов", example = "Операция не найдена")
 public class AppError {
+
     private String statusCode;
     private String message;
 

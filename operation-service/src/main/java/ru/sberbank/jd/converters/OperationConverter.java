@@ -1,9 +1,10 @@
 package ru.sberbank.jd.converters;
 
-import ru.sberbank.jd.dto.OperationTransferDto;
+import ru.sberbank.api.operation.service.dto.OperationTransferDto;
 import ru.sberbank.jd.entities.Operation;
 
 public class OperationConverter {
+
     public static OperationTransferDto entityToDto(Operation operation) {
         OperationTransferDto opDto = new OperationTransferDto();
         opDto.setId(operation.getId());
@@ -13,6 +14,7 @@ public class OperationConverter {
         opDto.setDescription(operation.getDescription());
         return opDto;
     }
+
     public static Operation createOf(OperationTransferDto opDto) {
         Operation result = new Operation();
         result.setAmount(opDto.getAmount());

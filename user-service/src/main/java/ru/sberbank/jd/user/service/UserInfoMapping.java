@@ -1,11 +1,13 @@
 package ru.sberbank.jd.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.stereotype.Component;
-import ru.sberbank.api.UserInfoDto;
+import ru.sberbank.api.user.service.dto.UserCreateDto;
+import ru.sberbank.api.user.service.dto.UserInfoDto;
+import ru.sberbank.api.user.service.dto.UserUpdateDto;
 import ru.sberbank.jd.user.model.UserInfo;
-import ru.sberbank.jd.user.model.dto.UserCreateDto;
-import ru.sberbank.jd.user.model.dto.UserUpdateDto;
+import ru.sberbank.jd.user.model.UserPassword;
 
 /**
  * Mappings from or to DTO.
@@ -36,6 +38,11 @@ public class UserInfoMapping {
         user.setPhone(dto.getPhone());
         user.setPhoneNormalized(normalizePhone(dto.getPhone()));
         user.setBirthDate(dto.getBirthDate());
+
+        UserPassword password = new UserPassword();
+        password.setPassword(PasswordEncoderFactories.createDelegatingPasswordEncoder()
+                .encode(dto.getPassword()));
+        user.setPassword(password);
 
         return user;
     }

@@ -1,4 +1,4 @@
-package ru.sberbank.jd.model;
+package ru.sberbank.api.account.service;
 
 public enum Type {
     ACCOUNT("ACCOUNT"),

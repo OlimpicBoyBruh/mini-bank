@@ -1,13 +1,15 @@
 package ru.sberbank.jd.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
-import ru.sberbank.jd.model.Type;
+import ru.sberbank.api.account.service.Type;
 
 /**
  * Entity объект Бд account_type.
@@ -16,6 +18,7 @@ import ru.sberbank.jd.model.Type;
 @Getter
 @Setter
 public class AccountType {
+
     @Id
     private String accountId;
     private String accountName;

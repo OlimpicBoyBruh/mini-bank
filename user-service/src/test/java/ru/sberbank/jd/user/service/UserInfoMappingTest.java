@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.sberbank.api.UserInfoDto;
+import ru.sberbank.api.user.service.dto.UserCreateDto;
+import ru.sberbank.api.user.service.dto.UserInfoDto;
+import ru.sberbank.api.user.service.dto.UserUpdateDto;
 import ru.sberbank.jd.user.model.UserInfo;
-import ru.sberbank.jd.user.model.dto.UserCreateDto;
-import ru.sberbank.jd.user.model.dto.UserUpdateDto;
 
 class UserInfoMappingTest {
 
@@ -45,6 +45,7 @@ class UserInfoMappingTest {
     public void testNormalizePhoneOnCrate() {
         UserCreateDto dto = new UserCreateDto();
         dto.setPhone("7-111-222-333");
+        dto.setPassword("test");
 
         UserInfo user = mapper.mapDtoToInfo(dto);
 

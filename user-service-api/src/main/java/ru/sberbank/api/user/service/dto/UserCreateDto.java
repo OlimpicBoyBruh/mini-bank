@@ -1,17 +1,16 @@
-package ru.sberbank.api;
+package ru.sberbank.api.user.service.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.UUID;
 import lombok.Data;
 
 /**
- * User info exchange object.
+ * DTO for creating new user.
  */
 @Data
-public class UserInfoDto {
+public class UserCreateDto {
 
-    private UUID id;
     @NotBlank
     private String firstName;
     @NotBlank
@@ -20,6 +19,8 @@ public class UserInfoDto {
     private String email;
     @NotBlank
     private String phone;
-    @NotBlank
+    @NotNull
     private LocalDate birthDate;
+    @NotNull
+    private String password;
 }

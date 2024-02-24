@@ -1,4 +1,4 @@
-package ru.sberbank.jd.user.model.dto;
+package ru.sberbank.api.user.service.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

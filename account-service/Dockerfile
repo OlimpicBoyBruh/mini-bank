@@ -1,4 +1,4 @@
-FROM arm64v8/openjdk:17
+FROM openjdk:17
 
 COPY target/account-service-1.0-SNAPSHOT.jar /usr/local/account-service-1.0-SNAPSHOT.jar
 

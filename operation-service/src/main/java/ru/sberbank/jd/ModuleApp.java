@@ -8,8 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {"ru.sberbank.jd"})
 public class ModuleApp {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ModuleApp.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ModuleApp.class, args);
+    }
 
 }

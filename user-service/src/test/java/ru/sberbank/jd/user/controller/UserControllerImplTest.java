@@ -22,8 +22,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.sberbank.api.UserInfoDto;
+import ru.sberbank.api.user.service.dto.UserInfoDto;
+import ru.sberbank.jd.user.repository.UserRepository;
 import ru.sberbank.jd.user.service.UserService;
 
 @SpringBootTest
@@ -40,6 +43,10 @@ class UserControllerImplTest {
 
     @MockBean
     private UserService service;
+    @MockBean
+    private JwtDecoder jwtDecoder;
+    @MockBean
+    private UserRepository userRepository;
 
     @BeforeEach
     public void setUp() {
@@ -54,9 +61,16 @@ class UserControllerImplTest {
     }
 
     @Test
-    public void testCreate() throws Exception {
+    public void testCreate_expectOk() throws Exception {
         mvc.perform(post("/user")
-                        .content("{}")
+                        .content("{"
+                                + "\"firstName\": \"test\","
+                                + "\"lastName\": \"test\","
+                                + "\"email\": \"1@1.ru\","
+                                + "\"phone\": \"+7-1\","
+                                + "\"birthDate\": \"2024-01-01\","
+                                + "\"password\": \"test\""
+                                + "}")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isCreated());
     }
@@ -75,6 +89,7 @@ class UserControllerImplTest {
     @Test
     public void testDelete() throws Exception {
         mvc.perform(delete("/user")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt())
                         .queryParam("id", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -83,6 +98,7 @@ class UserControllerImplTest {
     @Test
     public void testGet() throws Exception {
         mvc.perform(get("/user")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt())
                         .queryParam("id", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
@@ -93,6 +109,7 @@ class UserControllerImplTest {
         Mockito.when(service.getInfo(Mockito.any())).thenThrow(NoSuchElementException.class);
 
         mvc.perform(get("/user")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt())
                         .queryParam("id", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNotFound());
@@ -101,9 +118,14 @@ class UserControllerImplTest {
     @Test
     public void testUpdate() throws Exception {
         mvc.perform(put("/user")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .queryParam("id", UUID.randomUUID().toString())
-                        .content("{}"))
+                        .content("{"
+                                + "\"lastName\": \"test\","
+                                + "\"email\": \"1@1.ru\","
+                                + "\"lastName\": \"+7-22\""
+                                + "}"))
                 .andExpect(status().isOk());
     }
 }

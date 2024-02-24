@@ -1,4 +1,4 @@
-package ru.sberbank.jd.model.dto;
+package ru.sberbank.api.account.service.dto;
 
 import lombok.Getter;
 
@@ -7,6 +7,7 @@ import lombok.Getter;
  */
 @Getter
 public class ChangeAccountBalanceDto {
+
     private String numberAccount;
     private double changeBalance;
 }

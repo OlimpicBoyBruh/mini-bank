@@ -6,15 +6,21 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-import ru.sberbank.jd.converters.OperationConverter;
-import ru.sberbank.jd.dto.DepositeAccountDto;
-import ru.sberbank.jd.dto.OperationTransferDto;
-import ru.sberbank.jd.services.OperationService;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.sberbank.api.operation.service.dto.DepositeAccountDto;
+import ru.sberbank.api.operation.service.dto.OperationTransferDto;
+import ru.sberbank.jd.converters.OperationConverter;
+import ru.sberbank.jd.services.OperationService;
 
 @RestController
 @RequestMapping("/operation")
@@ -22,6 +28,7 @@ import java.util.stream.Collectors;
 @CrossOrigin("*")
 @Tag(name = "Контроллер операций по счетам", description = "Выполняет переводы и хранит историю")
 public class OperationController {
+
     private final OperationService operationService;
 
     @Operation(
@@ -34,13 +41,13 @@ public class OperationController {
     )
     @PostMapping()
     public void doTransfer(@RequestBody OperationTransferDto transferDto,
-                           @RequestHeader(name = "user-id") String userId) {
+            @RequestHeader(name = "user-id") String userId) {
         operationService.doTransferOperation(transferDto, userId);
     }
 
     @PostMapping("/depo_close")
     public void closeDepositeAccount(@RequestBody DepositeAccountDto depositeAccountDto,
-                                     @RequestHeader(name = "user-id") String userId) {
+            @RequestHeader(name = "user-id") String userId) {
         operationService.closeDepositeAccount(depositeAccountDto, userId);
 
     }
@@ -55,8 +62,9 @@ public class OperationController {
             }
     )
     @GetMapping("/{id}")
-    public OperationTransferDto findOperationById(@PathVariable @Parameter(description = "ID операции", required = true) Long id,
-                                                  @RequestHeader(name = "user-id") @Parameter(description = "ID пользователя") String userId) {
+    public OperationTransferDto findOperationById(
+            @PathVariable @Parameter(description = "ID операции", required = true) Long id,
+            @RequestHeader(name = "user-id") @Parameter(description = "ID пользователя") String userId) {
         return OperationConverter.entityToDto(operationService.findById(id, userId));
     }
 
@@ -70,8 +78,9 @@ public class OperationController {
             }
     )
     @GetMapping("/history/{account}")
-    public List<OperationTransferDto> findOperationByAccount(@PathVariable @Parameter(description = "Номер счета", required = true) String account,
-                                                             @RequestHeader(name = "user-id") @Parameter(description = "ID пользователя") String userId) {
+    public List<OperationTransferDto> findOperationByAccount(
+            @PathVariable @Parameter(description = "Номер счета", required = true) String account,
+            @RequestHeader(name = "user-id") @Parameter(description = "ID пользователя") String userId) {
         return operationService.findOperationByAccount(account, userId).stream()
                 .map(OperationConverter::entityToDto)
                 .collect(Collectors.toList());

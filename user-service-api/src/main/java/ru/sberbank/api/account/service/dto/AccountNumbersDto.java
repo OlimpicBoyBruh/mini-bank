@@ -1,4 +1,4 @@
-package ru.sberbank.jd.model.dto;
+package ru.sberbank.api.account.service.dto;
 
 import java.util.List;
 import lombok.Getter;
@@ -8,5 +8,6 @@ import lombok.Getter;
  */
 @Getter
 public class AccountNumbersDto {
+
     List<String> numberAccount;
 }

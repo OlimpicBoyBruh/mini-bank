@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @ConfigurationPropertiesScan
 @Data
 public class AccountServiceIntegrationProperties {
+
     private String url;
     private Integer connectTimeout;
     private Integer readTimeout;

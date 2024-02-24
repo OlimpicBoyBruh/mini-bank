@@ -5,9 +5,9 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.sberbank.api.UserInfoDto;
-import ru.sberbank.jd.user.model.dto.UserCreateDto;
-import ru.sberbank.jd.user.model.dto.UserUpdateDto;
+import ru.sberbank.api.user.service.dto.UserCreateDto;
+import ru.sberbank.api.user.service.dto.UserInfoDto;
+import ru.sberbank.api.user.service.dto.UserUpdateDto;
 import ru.sberbank.jd.user.service.UserService;
 
 /**

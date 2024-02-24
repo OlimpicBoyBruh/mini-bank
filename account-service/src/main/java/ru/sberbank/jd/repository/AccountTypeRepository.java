@@ -9,4 +9,5 @@ import ru.sberbank.jd.entity.AccountType;
  */
 @Repository
 public interface AccountTypeRepository extends JpaRepository<AccountType, String> {
+
 }
