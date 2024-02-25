@@ -1,22 +1,16 @@
 package ru.sberbank.jd.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import java.util.List;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.sberbank.api.account.service.dto.AccountDto;
 import ru.sberbank.api.account.service.dto.AccountNumberDto;
 import ru.sberbank.api.account.service.dto.ChangeAccountBalanceDto;
 import ru.sberbank.jd.entity.AccountClient;
 import ru.sberbank.jd.service.AccountClientService;
 import ru.sberbank.jd.service.AccountTypeService;
+
+import java.util.List;
 
 /**
  * Контроллер отвечает за отображение счетов авторизированного клиента.
@@ -66,7 +60,7 @@ public class ProfileController {
     )
     @PostMapping("/open/{accountTypeId}")
     public AccountClient openAccount(@RequestHeader("clientId") String clientId,
-            @PathVariable("accountTypeId") String accountTypeId) {
+                                     @PathVariable("accountTypeId") String accountTypeId) {
         return clientService.openAccount(clientId, accountTypeId);
     }
 
@@ -112,7 +106,7 @@ public class ProfileController {
     )
     @PutMapping("/close-account")
     public AccountClient closeAccountClient(@RequestBody AccountNumberDto accountNumber,
-            @RequestHeader("clientId") String clientId) {
+                                            @RequestHeader("clientId") String clientId) {
         clientService.closedAccount(accountNumber.getAccountNumber(), clientId);
         return clientService.findByNumberAccount(accountNumber.getAccountNumber());
     }
