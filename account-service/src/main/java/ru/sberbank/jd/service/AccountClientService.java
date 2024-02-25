@@ -103,12 +103,6 @@ public class AccountClientService {
         clientRepository.closeAccount(LocalDateTime.now(), accountNumber);
     }
 
-    public double roundTwoDecimals(double d) {
-        DecimalFormat twoDForm = new DecimalFormat("#.##");
-        String formattedNumber = twoDForm.format(d).replace(",", ".");
-        return Double.valueOf(formattedNumber);
-    }
-
     private AccountClient createAccount(String clientId, String accountId) {
         AccountType accountType = accountTypeService.getAccount(accountId);
         AccountClient accountClient = new AccountClient();
@@ -123,6 +117,12 @@ public class AccountClientService {
         accountClient.setType(accountType.getType());
         accountClient.setAccountType(accountType);
         return accountClient;
+    }
+
+    public double roundTwoDecimals(double d) {
+        DecimalFormat twoDForm = new DecimalFormat("#.##");
+        String formattedNumber = twoDForm.format(d).replace(",", ".");
+        return Double.valueOf(formattedNumber);
     }
 
     private String generateNumberAccount() {
