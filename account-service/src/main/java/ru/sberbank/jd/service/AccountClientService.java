@@ -2,6 +2,7 @@ package ru.sberbank.jd.service;
 
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -9,7 +10,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.sberbank.api.account.service.dto.AccountClientDto;
 import ru.sberbank.api.account.service.dto.AccountDto;
+import ru.sberbank.api.account.service.dto.AccountTypeDto;
 import ru.sberbank.jd.entity.AccountClient;
 import ru.sberbank.jd.entity.AccountType;
 import ru.sberbank.api.account.service.Status;
@@ -41,8 +44,16 @@ public class AccountClientService {
      * @param clientId идентификатор клиента.
      * @return list платежных счетов.
      */
-    public List<AccountClient> getAccounts(String clientId) {
-        return clientRepository.getClientAccounts(clientId);
+    public List<AccountClientDto> getAccounts(String clientId) {
+        List<AccountClient> accountClients = clientRepository.getClientAccounts(clientId);
+        List<AccountClientDto> accountClientDtos = new ArrayList<>();
+
+        for (AccountClient accountClient : accountClients) {
+            AccountClientDto accountClientDto = of(accountClient);
+            accountClientDtos.add(accountClientDto);
+        }
+
+        return accountClientDtos;
     }
 
     public AccountClient findByNumberAccount(String accountNumber) {
@@ -64,8 +75,16 @@ public class AccountClientService {
         return findByNumberAccount(numberAccount);
     }
 
-    public List<AccountClient> getDeposits(String clientId) {
-        return clientRepository.getClientDeposits(clientId);
+    public List<AccountClientDto> getDeposits(String clientId) {
+        List<AccountClient> accountClients = clientRepository.getClientDeposits(clientId);
+        List<AccountClientDto> accountClientDtos = new ArrayList<>();
+
+        for (AccountClient accountClient : accountClients) {
+            AccountClientDto accountClientDto = of(accountClient);
+            accountClientDtos.add(accountClientDto);
+        }
+
+        return accountClientDtos;
     }
 
     public AccountClient openAccount(String clientId, String accountId) {
@@ -118,7 +137,18 @@ public class AccountClientService {
         accountClient.setAccountType(accountType);
         return accountClient;
     }
-
+    public AccountClientDto of(AccountClient accountClient) {
+        AccountTypeDto accountTypeDto = of(accountClient.getAccountType());
+        return new AccountClientDto(accountClient.getNumberAccount(), accountClient.getIdClient(),
+                accountClient.getBalance(), accountClient.getOpeningDate(),
+                accountClient.getClosedDate(), accountClient.getStatus(),
+                accountClient.getType(), accountTypeDto);
+    }
+    public AccountTypeDto of(AccountType accountType) {
+        return new AccountTypeDto(accountType.getAccountId(), accountType.getAccountName(),
+                accountType.getInterestRate(), accountType.isReplenishmentOption(),
+                accountType.isWithdrawalOption(), accountType.getType());
+    }
     public double roundTwoDecimals(double d) {
         DecimalFormat twoDForm = new DecimalFormat("#.##");
         String formattedNumber = twoDForm.format(d).replace(",", ".");

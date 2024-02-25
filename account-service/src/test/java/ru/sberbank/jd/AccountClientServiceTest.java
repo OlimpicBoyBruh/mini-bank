@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.sberbank.api.account.service.Status;
 import ru.sberbank.api.account.service.Type;
+import ru.sberbank.api.account.service.dto.AccountClientDto;
 import ru.sberbank.api.account.service.dto.AccountDto;
 import ru.sberbank.jd.entity.AccountClient;
 import ru.sberbank.jd.entity.AccountType;
@@ -55,7 +56,8 @@ public class AccountClientServiceTest {
         List<AccountClient> accountClients = new ArrayList<>();
         accountClients.add(getAccountClient());
         when(accountClientRepository.getClientDeposits("testClientId")).thenReturn(accountClients);
-        accountClients = accountClientService.getDeposits("testClientId");
+        List<AccountClientDto> accountClientsDto = new ArrayList<>();
+        accountClientsDto = accountClientService.getDeposits("testClientId");
         AccountClient accountClient = accountClients.get(0);
         assertEquals(accountClient.getType(), Type.DEPOSIT);
     }
@@ -67,7 +69,8 @@ public class AccountClientServiceTest {
         accountClient.setType(Type.ACCOUNT);
         accountClients.add(accountClient);
         when(accountClientRepository.getClientDeposits("testClientId")).thenReturn(accountClients);
-        accountClients = accountClientService.getDeposits("testClientId");
+        List<AccountClientDto> accountClientsDto = new ArrayList<>();
+        accountClientsDto = accountClientService.getDeposits("testClientId");
         accountClient = accountClients.get(0);
         assertEquals(accountClient.getType(), Type.ACCOUNT);
     }

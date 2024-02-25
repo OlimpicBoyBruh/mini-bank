@@ -3,9 +3,10 @@ package ru.sberbank.jd.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.sberbank.api.account.service.dto.AccountClientDto;
 import ru.sberbank.api.account.service.dto.AccountDto;
 import ru.sberbank.api.account.service.dto.AccountNumberDto;
-import ru.sberbank.api.account.service.dto.ChangeAccountBalanceDto;
+import ru.sberbank.api.account.service.dto.ChangeBalanceDto;
 import ru.sberbank.jd.entity.AccountClient;
 import ru.sberbank.jd.service.AccountClientService;
 import ru.sberbank.jd.service.AccountTypeService;
@@ -32,7 +33,7 @@ public class ProfileController {
 
     @Operation(summary = "Returns all the customer's accounts")
     @GetMapping("/accounts")
-    public List<AccountClient> getAccounts(@RequestHeader("clientId") String clientId) {
+    public List<AccountClientDto> getAccounts(@RequestHeader("clientId") String clientId) {
         return clientService.getAccounts(clientId);
     }
 
@@ -44,7 +45,7 @@ public class ProfileController {
      */
     @Operation(summary = "Returns all accounts deposits")
     @GetMapping("/deposits")
-    public List<AccountClient> getDeposits(@RequestHeader("clientId") String clientId) {
+    public List<AccountClientDto> getDeposits(@RequestHeader("clientId") String clientId) {
         return clientService.getDeposits(clientId);
     }
 
@@ -88,7 +89,7 @@ public class ProfileController {
             description = "Changes the balance by the user's account number."
     )
     @PutMapping("/change-balance")
-    public AccountClient changeBalance(@RequestBody ChangeAccountBalanceDto changeAccountBalanceDto) {
+    public AccountClient changeBalance(@RequestBody ChangeBalanceDto changeAccountBalanceDto) {
         return clientService.changeBalance(changeAccountBalanceDto.getChangeBalance(),
                 changeAccountBalanceDto.getNumberAccount());
     }

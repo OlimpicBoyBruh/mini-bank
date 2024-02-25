@@ -10,19 +10,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.sberbank.api.account.service.Status;
 import ru.sberbank.api.account.service.Type;
-import ru.sberbank.api.account.service.dto.AccountDto;
-import ru.sberbank.api.account.service.dto.AccountNumberDto;
-import ru.sberbank.api.account.service.dto.ChangeAccountBalanceDto;
+import ru.sberbank.api.account.service.dto.*;
 import ru.sberbank.jd.controller.ProfileController;
 import ru.sberbank.jd.entity.AccountClient;
 import ru.sberbank.jd.entity.AccountType;
 import ru.sberbank.jd.service.AccountClientService;
 import ru.sberbank.jd.service.AccountTypeService;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -41,9 +36,10 @@ public class ProfileControllerTest {
 
     @BeforeEach
     public void init() {
-        List<AccountClient> accountClients = new ArrayList<>();
-        accountClients.add(getAccountClient());
-        when(accountClientService.getAccounts(anyString())).thenReturn(accountClients);
+        List<AccountClientDto> accountClientsDto = new ArrayList<>();
+        accountClientsDto.add(of(getAccountClient()));
+        when(accountClientService.getAccounts("testClientId")).thenReturn(accountClientsDto);
+        when(accountClientService.getDeposits("testClientId")).thenReturn(accountClientsDto);
         when(accountClientService.openAccount("testClientId", "12345"))
                 .thenReturn(getAccountClient());
         when(accountClientService.getAccountInfo("4004"))
@@ -56,6 +52,10 @@ public class ProfileControllerTest {
     @Test
     public void getAccountsAndDepositsTest() throws Exception {
         mockMvc.perform(get("/profile/accounts").header("clientId", "testClientId"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].idClient").value("testClientId"));
+
+        mockMvc.perform(get("/profile/deposits").header("clientId", "testClientId"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].idClient").value("testClientId"));
 
@@ -79,7 +79,7 @@ public class ProfileControllerTest {
     @Test
     public void changeBalanceTest() throws Exception {
         String changeBalanceDto = mapper
-                .writeValueAsString(new ChangeAccountBalanceDto("4004", 5));
+                .writeValueAsString(new ChangeBalanceDto("4004", 5));
 
         mockMvc.perform(put("/profile/change-balance")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -116,6 +116,18 @@ public class ProfileControllerTest {
         accountType.setAccountId("12345");
         accountType.setInterestRate(5);
         return accountType;
+    }
+    private AccountClientDto of(AccountClient accountClient) {
+        AccountTypeDto accountTypeDto = of(accountClient.getAccountType());
+        return new AccountClientDto(accountClient.getNumberAccount(), accountClient.getIdClient(),
+                accountClient.getBalance(), accountClient.getOpeningDate(),
+                accountClient.getClosedDate(), accountClient.getStatus(),
+                accountClient.getType(), accountTypeDto);
+    }
+    private AccountTypeDto of(AccountType accountType) {
+        return new AccountTypeDto(accountType.getAccountId(), accountType.getAccountName(),
+                accountType.getInterestRate(), accountType.isReplenishmentOption(),
+                accountType.isWithdrawalOption(), accountType.getType());
     }
 
 }
