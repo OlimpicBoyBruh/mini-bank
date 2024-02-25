@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sberbank.api.user.service.dto.UserCreateDto;
 import ru.sberbank.api.user.service.dto.UserInfoDto;
@@ -26,7 +27,7 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public UserInfoDto delete(UUID userId) {
+    public UserInfoDto delete(UUID userId, Jwt token) {
         return userService.deleteInfo(userId);
     }
 

@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,7 +56,7 @@ public interface UserController {
                     @ApiResponse(responseCode = "404", description = "User not found",
                             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})}
     )
-    UserInfoDto delete(@RequestParam(name = "id") UUID userId);
+    UserInfoDto delete(@RequestParam(name = "id") UUID userId, @AuthenticationPrincipal Jwt token);
 
     @GetMapping
     @Operation(summary = "Get user information",

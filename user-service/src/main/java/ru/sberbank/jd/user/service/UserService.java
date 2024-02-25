@@ -1,16 +1,20 @@
 package ru.sberbank.jd.user.service;
 
 import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ru.sberbank.api.account.service.dto.AccountDto;
+import ru.sberbank.api.account.service.dto.AccountNumberDto;
 import ru.sberbank.api.user.service.dto.UserCreateDto;
 import ru.sberbank.api.user.service.dto.UserInfoDto;
 import ru.sberbank.api.user.service.dto.UserUpdateDto;
 import ru.sberbank.jd.user.model.UserInfo;
 import ru.sberbank.jd.user.repository.UserRepository;
-import ru.sberbank.jd.user.service.client.AccountServiceClient;
+import ru.sberbank.jd.user.service.rest.client.AccountClient;
 
 /**
  * Сервис данных пользователей.
@@ -19,20 +23,24 @@ import ru.sberbank.jd.user.service.client.AccountServiceClient;
 @RequiredArgsConstructor
 public class UserService {
 
+    private static final String CLIENT_ID = "clientId";
+    @Value("${app.account.type}")
+    private String accountType;
+
     private final UserRepository userRepository;
     private final UserInfoMapping userInfoMapping;
     private final UserInfoChecks userInfoChecks;
-    private final AccountServiceClient accountClient;
+    private final AccountClient accountClient;
 
     @Transactional
     public UserInfoDto createUser(UserCreateDto dto) {
         UserInfo user = userInfoMapping.mapDtoToInfo(dto);
 
-        accountClient.open();
-
         checkUser(user);
         userInfoChecks.checkBirthDate(user.getBirthDate());
         user = userRepository.save(user);
+
+        accountClient.createAccount(accountType, user.getId().toString());
 
         return userInfoMapping.mapInfoToDto(user);
     }
@@ -46,6 +54,17 @@ public class UserService {
     @Transactional
     public UserInfoDto deleteInfo(UUID userId) {
         UserInfo user = findUser(userId);
+
+        List<AccountDto> accounts = accountClient.getAccounts(userId.toString());
+        List<AccountDto> deposits = accountClient.getDeposits(userId.toString());
+
+        for (AccountDto account : accounts) {
+            accountClient.deleteAccount(new AccountNumberDto(account.getNumberAccount()), userId.toString());
+        }
+
+        for (AccountDto deposit : deposits) {
+            accountClient.deleteAccount(new AccountNumberDto(deposit.getNumberAccount()), userId.toString());
+        }
 
         userRepository.delete(user);
 
@@ -67,12 +86,12 @@ public class UserService {
         userInfoChecks.checkPhone(user.getPhone());
         userInfoChecks.checkEmail(user.getEmail());
 
-        if (userRepository.findByEmail(user.getEmail()) != null) {
+        if (userRepository.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException(
                     String.format("User with email %1$s already exists", user.getEmail()));
         }
 
-        if (userRepository.findByPhoneNormalized(user.getPhoneNormalized()) != null) {
+        if (userRepository.existsByPhoneNormalized(user.getPhoneNormalized())) {
             throw new IllegalArgumentException(
                     String.format("User with phone %1$s already exists", user.getPhone()));
         }
