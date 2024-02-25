@@ -1,20 +1,15 @@
 package ru.sberbank.jd.integration;
 
-import java.rmi.ServerException;
-import java.rmi.server.ServerNotActiveException;
-import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import ru.sberbank.api.account.service.dto.AccountDto;
+import ru.sberbank.api.account.service.dto.AccountNumberDto;
 import ru.sberbank.api.account.service.dto.ChangeBalanceDto;
-import ru.sberbank.jd.exceptions.AppError;
-import ru.sberbank.jd.exceptions.ResourceNotFoundException;
-import ru.sberbank.jd.exceptions.ServiceErrors;
+import ru.sberbank.jd.exceptions.*;
 import ru.sberbank.jd.properties.AccountServiceIntegrationProperties;
 
 @Component
@@ -49,31 +44,6 @@ public class AccountServiceIntegration {
     }
 
     private WebClient.ResponseSpec getOnStatus(String baseUrl, String uri, String userId) {
-        Function<ClientResponse, Mono<? extends Throwable>> clientResponse4xxError = clientResponse -> clientResponse.bodyToMono(
-                AppError.class).map(
-                body -> {
-                    if (body.getStatusCode().equals(ServiceErrors.NOT_FOUND.name())) {
-                        log.error("Выполнен некорректный запрос к сервису счетов: счет не найден");
-                        return new ResourceNotFoundException(
-                                "Выполнен некорректный запрос к сервису корзин: счет не найден");
-                    }
-                    log.error("Выполнен некорректный запрос к сервису счетов: причина неизвестна");
-                    return new ResourceNotFoundException(
-                            "Выполнен некорректный запрос к сервису счетов: причина неизвестна");
-                }
-        );
-        Function<ClientResponse, Mono<? extends Throwable>> clientResponse5xxError = clientResponse -> clientResponse.bodyToMono(
-                AppError.class).map(
-                body -> {
-                    if (body.getStatusCode().equals(ServiceErrors.SERVICE_UNAVAILABLE.name())) {
-                        log.error("Выполнен некорректный запрос к сервису счетов: сервис недоступен");
-                        return new ServerNotActiveException(
-                                "Выполнен некорректный запрос к сервису счетов: сервис недоступен");
-                    }
-                    log.error("Не выполнено. Внутренняя ошибка сервера.");
-                    return new ServerException("Не выполнено. Внутренняя ошибка сервера.");
-                }
-        );
         return webClient
                 .baseUrl(baseUrl)
                 .build()
@@ -83,11 +53,32 @@ public class AccountServiceIntegration {
                 .retrieve()
                 .onStatus(
                         HttpStatusCode::is4xxClientError,
-                        clientResponse4xxError
+                        error -> Mono.error(new ResourceNotFoundException("Выполнен некорректный запрос к сервису счетов: счет не найден"))
                 )
                 .onStatus(
                         HttpStatusCode::is5xxServerError,
-                        clientResponse5xxError
+                        error -> Mono.error(new InvalidParamsException("Выполнен некорректный запрос к сервису счетов: сервис недоступен"))
                 );
+    }
+
+    public String closeDepositeAccount(AccountNumberDto accountNumberDto, String userId) {
+        return webClient
+                .baseUrl(properties.getUrl())
+                .build()
+                .put()
+                .uri(ACCOUNT_CLOSE)
+                .header("userId", userId)
+                .body(Mono.just(accountNumberDto), AccountNumberDto.class)
+                .retrieve()
+                .onStatus(
+                        HttpStatusCode::is4xxClientError,
+                        error -> Mono.error(new ResourceNotFoundException("Выполнен некорректный запрос к сервису счетов: счет не найден либо баланс не нулевой"))
+                )
+                .onStatus(
+                        HttpStatusCode::is5xxServerError,
+                        error -> Mono.error(new InvalidParamsException("Выполнен некорректный запрос к сервису счетов: сервис недоступен"))
+                )
+                .bodyToMono(String.class)
+                .block();
     }
 }

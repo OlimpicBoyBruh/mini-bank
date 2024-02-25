@@ -2,12 +2,15 @@ package ru.sberbank.jd.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,20 +36,26 @@ public class OperationController {
 
     @Operation(
             summary = "Выполнение операции по переводу средств с одного счета на другой",
-            responses = {
-                    @ApiResponse(
-                            description = "Успешный ответ", responseCode = "200"
-                    )
-            }
+            responses = {@ApiResponse(description = "Успешный ответ", responseCode = "200")}
     )
     @PostMapping()
-    public void doTransfer(@RequestBody OperationTransferDto transferDto,
+    public void doTransfer(
+            @Parameter(description = "DTO операции перевода средств", name = "transferDto", required = true)
+            @RequestBody OperationTransferDto transferDto,
+            @Parameter(description = "ID пользователя")
             @RequestHeader(name = "user-id") String userId) {
         operationService.doTransferOperation(transferDto, userId);
     }
 
+    @Operation(
+            summary = "Закрытие депозитного счета с переводом средств и процентов на счет возврата",
+            responses = {@ApiResponse(description = "Успешный ответ", responseCode = "200")}
+    )
     @PostMapping("/depo_close")
-    public void closeDepositeAccount(@RequestBody DepositeAccountDto depositeAccountDto,
+    public void closeDepositeAccount(
+            @Parameter(description = "DTO закрываемого депозита", name = "depositeAccountDto", required = true)
+            @RequestBody DepositeAccountDto depositeAccountDto,
+            @Parameter(description = "ID пользователя")
             @RequestHeader(name = "user-id") String userId) {
         operationService.closeDepositeAccount(depositeAccountDto, userId);
 
@@ -54,33 +63,33 @@ public class OperationController {
 
     @Operation(
             summary = "Получение информации по проведенной операции",
-            responses = {
-                    @ApiResponse(
-                            description = "Успешный ответ", responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = OperationTransferDto.class))
-                    )
-            }
+            responses = {@ApiResponse(
+                    description = "Успешный ответ", responseCode = "200",
+                    content = @Content(schema = @Schema(implementation = OperationTransferDto.class)))}
     )
     @GetMapping("/{id}")
     public OperationTransferDto findOperationById(
-            @PathVariable @Parameter(description = "ID операции", required = true) Long id,
-            @RequestHeader(name = "user-id") @Parameter(description = "ID пользователя") String userId) {
+            @Parameter(description = "ID операции", name = "id")
+            @PathVariable(name = "id") Long id,
+            @Parameter(description = "ID пользователя")
+            @RequestHeader(name = "user-id") String userId) {
         return OperationConverter.entityToDto(operationService.findById(id, userId));
     }
 
     @Operation(
             summary = "Получение списка операций по счету",
-            responses = {
-                    @ApiResponse(
-                            description = "Успешный ответ", responseCode = "200",
-                            content = @Content(schema = @Schema(implementation = OperationTransferDto.class))
-                    )
+            responses = {@ApiResponse(
+                    description = "Успешный ответ", responseCode = "200",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = OperationTransferDto.class))))
             }
     )
     @GetMapping("/history/{account}")
     public List<OperationTransferDto> findOperationByAccount(
-            @PathVariable @Parameter(description = "Номер счета", required = true) String account,
-            @RequestHeader(name = "user-id") @Parameter(description = "ID пользователя") String userId) {
+            @Parameter(description = "Номер счета")
+            @PathVariable(name = "account") String account,
+            @Parameter(description = "ID пользователя")
+            @RequestHeader(name = "user-id") String userId) {
         return operationService.findOperationByAccount(account, userId).stream()
                 .map(OperationConverter::entityToDto)
                 .collect(Collectors.toList());
