@@ -1,11 +1,12 @@
 package ru.sberbank.api.account.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Schema(description = "Информация о изменении баланса счета")
 public class ChangeBalanceDto {
 
