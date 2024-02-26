@@ -106,10 +106,14 @@ public class ProfileController {
                     "A zero balance is required for successful closing."
     )
     @PutMapping("/close-account")
-    public AccountClient closeAccountClient(@RequestBody AccountNumberDto accountNumber,
+    public AccountClientDto closeAccountClient(@RequestBody AccountNumberDto accountNumber,
                                             @RequestHeader("clientId") String clientId) {
-        clientService.closedAccount(accountNumber.getAccountNumber(), clientId);
-        return clientService.findByNumberAccount(accountNumber.getAccountNumber());
+       return clientService.closedAccount(accountNumber.getAccountNumber(), clientId);
+
+    }
+    @GetMapping("/bank-account")
+    public AccountClientDto getBankAccount() {
+        return clientService.getBankAccount();
     }
 
 }

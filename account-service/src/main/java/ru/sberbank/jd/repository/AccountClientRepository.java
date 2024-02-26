@@ -26,6 +26,9 @@ public interface AccountClientRepository extends JpaRepository<AccountClient, St
             nativeQuery = true)
     List<AccountClient> getClientAccounts(@Param("clientId") String clientId);
 
+    @Query(value = "select * from account_client where number_account = :accountNumber",
+    nativeQuery = true)
+    AccountClient getAccountForId(@Param("accountNumber") String accountNumber);
     /**
      * Возвращает все вклады клиента.
      *
@@ -35,7 +38,8 @@ public interface AccountClientRepository extends JpaRepository<AccountClient, St
     @Query(value = "select * from account_client where id_client = :clientId and type = 'DEPOSIT' and status= 'ACTIVE'",
             nativeQuery = true)
     List<AccountClient> getClientDeposits(@Param("clientId") String clientId);
-
+    @Query(value = "select * from account_client where number_account = '400000000000000000000'", nativeQuery = true)
+    AccountClient getBankAccount();
     List<AccountClient> findByNumberAccountIn(List<String> accountNumbers);
 
     @Transactional
