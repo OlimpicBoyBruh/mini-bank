@@ -105,7 +105,7 @@ public class AccountClientService {
                 accountClient.getStatus().toString(), accountClient.getIdClient());
     }
 
-    public void closedAccount(String accountNumber, String clientId) {
+    public AccountClientDto closedAccount(String accountNumber, String clientId) {
         AccountClient accountClient = findByNumberAccount(accountNumber);
         if (!accountClient.getIdClient().equals(clientId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Счет не найден");
@@ -117,6 +117,11 @@ public class AccountClientService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Для закрытия счета, баланс должен быть равен 0");
         }
         clientRepository.closeAccount(LocalDateTime.now(), accountNumber);
+        return of(findByNumberAccount(accountNumber));
+    }
+
+    public AccountClientDto getBankAccount() {
+        return of(clientRepository.getBankAccount());
     }
 
     private AccountClient createAccount(String clientId, String accountId) {
