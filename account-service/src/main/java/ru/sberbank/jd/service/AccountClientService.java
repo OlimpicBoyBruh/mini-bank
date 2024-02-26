@@ -47,12 +47,10 @@ public class AccountClientService {
     public List<AccountClientDto> getAccounts(String clientId) {
         List<AccountClient> accountClients = clientRepository.getClientAccounts(clientId);
         List<AccountClientDto> accountClientDtos = new ArrayList<>();
-
         for (AccountClient accountClient : accountClients) {
             AccountClientDto accountClientDto = of(accountClient);
             accountClientDtos.add(accountClientDto);
         }
-
         return accountClientDtos;
     }
 
@@ -64,15 +62,14 @@ public class AccountClientService {
     public AccountClient changeBalance(double change, String numberAccount) {
         AccountClient accountClient = findByNumberAccount(numberAccount);
         double amount = roundTwoDecimals(change);
-
         if (accountClient.getStatus().equals(Status.CLOSED)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Счет уже закрыт");
         }
         if (accountClient.getBalance() + amount < 0) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "На балансе недостаточно средств");
         }
-        clientRepository.changeBalance(amount, numberAccount);
-        return findByNumberAccount(numberAccount);
+        accountClient.setBalance(accountClient.getBalance() + change);
+        return clientRepository.save(accountClient);
     }
 
     public List<AccountClientDto> getDeposits(String clientId) {
@@ -108,7 +105,7 @@ public class AccountClientService {
                 accountClient.getStatus().toString(), accountClient.getIdClient());
     }
 
-    public void closedAccount(String accountNumber, String clientId) {
+    public AccountClientDto closedAccount(String accountNumber, String clientId) {
         AccountClient accountClient = findByNumberAccount(accountNumber);
         if (!accountClient.getIdClient().equals(clientId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Счет не найден");
@@ -120,6 +117,11 @@ public class AccountClientService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Для закрытия счета, баланс должен быть равен 0");
         }
         clientRepository.closeAccount(LocalDateTime.now(), accountNumber);
+        return of(findByNumberAccount(accountNumber));
+    }
+
+    public AccountClientDto getBankAccount() {
+        return of(clientRepository.getBankAccount());
     }
 
     private AccountClient createAccount(String clientId, String accountId) {
