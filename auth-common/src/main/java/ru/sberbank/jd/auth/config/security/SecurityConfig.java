@@ -52,6 +52,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
+                .anonymous(anon -> anon.disable())
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/swagger-resources/**", "/swagger-ui/**",
                                 "/v3/api-docs/**", "/error", "/swagger").permitAll()
