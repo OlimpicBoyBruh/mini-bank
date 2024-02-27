@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,15 +42,19 @@ public class OperationController {
             }
     )
     @PostMapping()
-    public void doTransfer(@RequestBody OperationTransferDto transferDto,
-            @RequestHeader(name = "user-id") String userId) {
-        operationService.doTransferOperation(transferDto, userId);
+    public void doTransfer(
+            @RequestBody OperationTransferDto transferDto,
+            @RequestHeader(name = "clientId") String userId,
+            @AuthenticationPrincipal Jwt token) {
+        operationService.doTransferOperation(transferDto, userId, token);
     }
 
     @PostMapping("/depo_close")
-    public void closeDepositeAccount(@RequestBody DepositeAccountDto depositeAccountDto,
-            @RequestHeader(name = "user-id") String userId) {
-        operationService.closeDepositeAccount(depositeAccountDto, userId);
+    public void closeDepositeAccount(
+            @RequestBody DepositeAccountDto depositeAccountDto,
+            @RequestHeader(name = "clientId") String userId,
+            @AuthenticationPrincipal Jwt token) {
+        operationService.closeDepositeAccount(depositeAccountDto, userId, token);
 
     }
 
@@ -63,9 +69,10 @@ public class OperationController {
     )
     @GetMapping("/{id}")
     public OperationTransferDto findOperationById(
-            @PathVariable @Parameter(description = "ID операции", required = true) Long id,
-            @RequestHeader(name = "user-id") @Parameter(description = "ID пользователя") String userId) {
-        return OperationConverter.entityToDto(operationService.findById(id, userId));
+            @PathVariable("id") @Parameter(description = "ID операции", required = true) Long id,
+            @RequestHeader(name = "clientId") @Parameter(description = "ID пользователя") String userId,
+            @AuthenticationPrincipal Jwt token) {
+        return OperationConverter.entityToDto(operationService.findById(id, userId, token));
     }
 
     @Operation(
@@ -79,9 +86,10 @@ public class OperationController {
     )
     @GetMapping("/history/{account}")
     public List<OperationTransferDto> findOperationByAccount(
-            @PathVariable @Parameter(description = "Номер счета", required = true) String account,
-            @RequestHeader(name = "user-id") @Parameter(description = "ID пользователя") String userId) {
-        return operationService.findOperationByAccount(account, userId).stream()
+            @PathVariable("account") @Parameter(description = "Номер счета", required = true) String account,
+            @RequestHeader(name = "clientId") @Parameter(description = "ID пользователя") String userId,
+            @AuthenticationPrincipal Jwt token) {
+        return operationService.findOperationByAccount(account, userId, token).stream()
                 .map(OperationConverter::entityToDto)
                 .collect(Collectors.toList());
     }

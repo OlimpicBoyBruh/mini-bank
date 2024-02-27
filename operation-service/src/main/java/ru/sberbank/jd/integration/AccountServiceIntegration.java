@@ -5,7 +5,9 @@ import java.rmi.server.ServerNotActiveException;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -28,27 +30,29 @@ public class AccountServiceIntegration {
     private final String ACCOUNT_CHANGE_BALANCE = "/change-balance";
     private final String ACCOUNT_INFO = "/get-info/"; // /get-info/{accountNumber}
     private final String ACCOUNT_CLOSE = "/close-account";
+    private final String BEARER = "Bearer ";
 
-    public AccountDto findByAccountId(String id, String userId) {
-        return getOnStatus(properties.getUrl(), ACCOUNT_INFO + id, userId)
+    public AccountDto findByAccountId(String id, String userId, Jwt token) {
+        return getOnStatus(properties.getUrl(), ACCOUNT_INFO + id, userId, token)
                 .bodyToMono(AccountDto.class)
                 .block();
     }
 
-    public AccountDto changeAccountBalance(ChangeBalanceDto changeBalanceDto, String userId) {
+    public AccountDto changeAccountBalance(ChangeBalanceDto changeBalanceDto, String userId, Jwt token) {
         return webClient
                 .baseUrl(properties.getUrl())
                 .build()
                 .put()
                 .uri(ACCOUNT_CHANGE_BALANCE)
                 .header("userId", userId)
+                .header(HttpHeaders.AUTHORIZATION, BEARER + token.getTokenValue())
                 .body(Mono.just(changeBalanceDto), ChangeBalanceDto.class)
                 .retrieve()
                 .bodyToMono(AccountDto.class)
                 .block();
     }
 
-    private WebClient.ResponseSpec getOnStatus(String baseUrl, String uri, String userId) {
+    private WebClient.ResponseSpec getOnStatus(String baseUrl, String uri, String userId, Jwt token) {
         Function<ClientResponse, Mono<? extends Throwable>> clientResponse4xxError = clientResponse -> clientResponse.bodyToMono(
                 AppError.class).map(
                 body -> {
@@ -80,6 +84,7 @@ public class AccountServiceIntegration {
                 .get()
                 .uri(uri)
                 .header("userId", userId)
+                .header(HttpHeaders.AUTHORIZATION, BEARER + token.getTokenValue())
                 .retrieve()
                 .onStatus(
                         HttpStatusCode::is4xxClientError,
