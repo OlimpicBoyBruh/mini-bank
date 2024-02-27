@@ -10,14 +10,19 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     properties:
-      hibernate.jdbc.time_zone: UTC
+      hibernate:
+        jdbc.time_zone: UTC
+        default_schema: "${app.schema}"
     hibernate:
       ddl-auto: validate
-      default_schema: "account_service"
+      default_schema: "${app.schema}"
   liquibase:
-    defaultSchema: "account_service"
+    defaultSchema: "${app.schema}"
 springdoc:
   swagger-ui:
     path: "/swagger"
     disable-swagger-default-url: true
     use-root-path: true
+
+app:
+  schema: "account_service"
