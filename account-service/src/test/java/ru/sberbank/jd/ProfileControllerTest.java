@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.sberbank.api.account.service.Status;
 import ru.sberbank.api.account.service.Type;
@@ -51,11 +52,23 @@ public class ProfileControllerTest {
 
     @Test
     public void getAccountsAndDepositsTest() throws Exception {
-        mockMvc.perform(get("/profile/accounts").header("clientId", "testClientId"))
+        mockMvc.perform(get("/profile/accounts")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt
+                                .subject("testClientId")
+                                .issuer("user-service")
+                                .claim("scope", "USER")
+                                .build()))
+                        .header("clientId", "testClientId"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].idClient").value("testClientId"));
 
-        mockMvc.perform(get("/profile/deposits").header("clientId", "testClientId"))
+        mockMvc.perform(get("/profile/deposits")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt
+                                .subject("testClientId")
+                                .issuer("user-service")
+                                .claim("scope", "USER")
+                                .build()))
+                        .header("clientId", "testClientId"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].idClient").value("testClientId"));
 
@@ -63,7 +76,13 @@ public class ProfileControllerTest {
 
     @Test
     public void openAccountTest() throws Exception {
-        mockMvc.perform(post("/profile/open/12345").header("clientId", "testClientId"))
+        mockMvc.perform(post("/profile/open/12345")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt
+                                .subject("testClientId")
+                                .issuer("user-service")
+                                .claim("scope", "USER")
+                                .build()))
+                        .header("clientId", "testClientId"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.idClient").value("testClientId"));
 
@@ -72,7 +91,13 @@ public class ProfileControllerTest {
 
     @Test
     public void getInfoAccountTest() throws Exception {
-        mockMvc.perform(get("/profile/get-info/4004")).andExpect(status().isOk())
+        mockMvc.perform(get("/profile/get-info/4004")
+                .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt
+                        .subject("testClientId")
+                        .issuer("user-service")
+                        .claim("scope", "USER")
+                        .build())))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("ACTIVE"));
     }
 
@@ -82,6 +107,11 @@ public class ProfileControllerTest {
                 .writeValueAsString(new ChangeBalanceDto("4004", 5));
 
         mockMvc.perform(put("/profile/change-balance")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt
+                                .subject("testClientId")
+                                .issuer("user-service")
+                                .claim("scope", "USER")
+                                .build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(changeBalanceDto)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("ACTIVE"));
@@ -92,6 +122,11 @@ public class ProfileControllerTest {
         AccountNumberDto accountNumberDto = new AccountNumberDto("4004");
         String accountNumber = mapper.writeValueAsString(accountNumberDto);
         mockMvc.perform(put("/profile/close-account").header("clientId", "testClientId")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt
+                                .subject("testClientId")
+                                .issuer("user-service")
+                                .claim("scope", "USER")
+                                .build()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(accountNumber))
                 .andExpect(status().isOk());

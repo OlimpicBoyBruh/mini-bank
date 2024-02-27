@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import ru.sberbank.api.account.service.dto.AccountDto;
 import ru.sberbank.api.account.service.dto.AccountNumberDto;
@@ -15,6 +16,7 @@ import ru.sberbank.api.user.service.dto.UserUpdateDto;
 import ru.sberbank.jd.user.model.UserInfo;
 import ru.sberbank.jd.user.repository.UserRepository;
 import ru.sberbank.jd.user.service.rest.client.AccountClient;
+import ru.sberbank.jd.user.service.security.AuthService;
 
 /**
  * Сервис данных пользователей.
@@ -24,23 +26,26 @@ import ru.sberbank.jd.user.service.rest.client.AccountClient;
 public class UserService {
 
     private static final String CLIENT_ID = "clientId";
-    @Value("${app.account.type}")
-    private String accountType;
+    private static final String BEARER = "Bearer ";
 
     private final UserRepository userRepository;
     private final UserInfoMapping userInfoMapping;
     private final UserInfoChecks userInfoChecks;
     private final AccountClient accountClient;
+    private final AuthService authService;
 
-    @Transactional
+    @Value("${app.account.type}")
+    private String accountType;
+
     public UserInfoDto createUser(UserCreateDto dto) {
         UserInfo user = userInfoMapping.mapDtoToInfo(dto);
 
         checkUser(user);
         userInfoChecks.checkBirthDate(user.getBirthDate());
-        user = userRepository.save(user);
+        user = save(user);
 
-        accountClient.createAccount(accountType, user.getId().toString());
+        Jwt token = authService.login(user.getId(), user.getEmail(), "USER");
+        accountClient.createAccount(accountType, user.getId().toString(), BEARER + token.getTokenValue());
 
         return userInfoMapping.mapInfoToDto(user);
     }
@@ -51,35 +56,46 @@ public class UserService {
         return userInfoMapping.mapInfoToDto(user);
     }
 
-    @Transactional
-    public UserInfoDto deleteInfo(UUID userId) {
+    public UserInfoDto deleteInfo(UUID userId, Jwt token) {
         UserInfo user = findUser(userId);
 
-        List<AccountDto> accounts = accountClient.getAccounts(userId.toString());
-        List<AccountDto> deposits = accountClient.getDeposits(userId.toString());
+        List<AccountDto> accounts = accountClient.getAccounts(userId.toString(),
+                BEARER + token.getTokenValue());
+        List<AccountDto> deposits = accountClient.getDeposits(userId.toString(),
+                BEARER + token.getTokenValue());
 
         for (AccountDto account : accounts) {
-            accountClient.deleteAccount(new AccountNumberDto(account.getNumberAccount()), userId.toString());
+            accountClient.deleteAccount(new AccountNumberDto(account.getNumberAccount()),
+                    userId.toString(), BEARER + token);
         }
-
         for (AccountDto deposit : deposits) {
-            accountClient.deleteAccount(new AccountNumberDto(deposit.getNumberAccount()), userId.toString());
+            accountClient.deleteAccount(new AccountNumberDto(deposit.getNumberAccount()),
+                    userId.toString(), BEARER + token);
         }
 
-        userRepository.delete(user);
+        delete(user);
 
         return userInfoMapping.mapInfoToDto(user);
     }
 
-    @Transactional
     public UserInfoDto updateInfo(UUID userId, UserUpdateDto dto) {
         UserInfo user = findUser(userId);
 
         userInfoMapping.mapDtoToInfo(user, dto);
         checkUser(user);
-        userRepository.save(user);
+        user = save(user);
 
         return userInfoMapping.mapInfoToDto(user);
+    }
+
+    @Transactional
+    private UserInfo save(UserInfo user) {
+        return userRepository.saveAndFlush(user);
+    }
+
+    @Transactional
+    private void delete(UserInfo user) {
+        userRepository.delete(user);
     }
 
     private void checkUser(UserInfo user) {

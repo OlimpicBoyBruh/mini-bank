@@ -1,0 +1,3 @@
+app:
+  keys:
+    public: "classpath:keys/public.key"
