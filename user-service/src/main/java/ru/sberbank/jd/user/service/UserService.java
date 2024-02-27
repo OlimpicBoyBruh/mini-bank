@@ -66,11 +66,11 @@ public class UserService {
 
         for (AccountDto account : accounts) {
             accountClient.deleteAccount(new AccountNumberDto(account.getNumberAccount()),
-                    userId.toString(), BEARER + token);
+                    userId.toString(), BEARER + token.getTokenValue());
         }
         for (AccountDto deposit : deposits) {
             accountClient.deleteAccount(new AccountNumberDto(deposit.getNumberAccount()),
-                    userId.toString(), BEARER + token);
+                    userId.toString(), BEARER + token.getTokenValue());
         }
 
         delete(user);
@@ -102,12 +102,14 @@ public class UserService {
         userInfoChecks.checkPhone(user.getPhone());
         userInfoChecks.checkEmail(user.getEmail());
 
-        if (userRepository.existsByEmail(user.getEmail())) {
+        if ((user.getId() == null && userRepository.existsByEmail(user.getEmail()))
+                || (userRepository.existsByEmailAndIdNot(user.getEmail(), user.getId()))) {
             throw new IllegalArgumentException(
                     String.format("User with email %1$s already exists", user.getEmail()));
         }
 
-        if (userRepository.existsByPhoneNormalized(user.getPhoneNormalized())) {
+        if ((user.getId() == null && userRepository.existsByPhoneNormalized(user.getPhoneNormalized()))
+                || userRepository.existsByPhoneNormalizedAndIdNot(user.getPhoneNormalized(), user.getId())) {
             throw new IllegalArgumentException(
                     String.format("User with phone %1$s already exists", user.getPhone()));
         }
