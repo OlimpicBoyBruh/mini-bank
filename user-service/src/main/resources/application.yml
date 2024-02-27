@@ -37,13 +37,14 @@ app:
   schema: "user_service"
   token-duration: 180
   account:
-    host: localhost
-    port: 8190
-    url: http://${app.account.host}:${app.account.port}/profile
+    type: "45678"
+    host: "localhost"
+    port: "8190"
+    url: http://${app.account.host}:${app.account.port}
 
 #debug: true
 #logging:
 #  level:
 #    root: DEBUG
-#    org.springframework.web: TRACE
+#    org.springframework.web: DEBUG
 #    org.springframework.security: TRACE

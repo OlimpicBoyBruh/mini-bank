@@ -3,23 +3,35 @@ package ru.sberbank.jd.user.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.sberbank.api.user.service.dto.UserInfoDto;
 import ru.sberbank.jd.user.model.UserInfo;
+import ru.sberbank.jd.user.model.UserPassword;
 import ru.sberbank.jd.user.repository.UserRepository;
+import ru.sberbank.jd.user.service.rest.client.AccountClient;
 
-@Disabled
+@SpringBootTest
 class UserServiceTest {
 
+    @MockBean
     private UserInfoMapping mapper;
+    @MockBean
     private UserInfoChecks checks;
+    @MockBean
     private UserRepository userRepository;
+    @MockBean
+    private AccountClient accountClient;
+
+    @Autowired
     private UserService userService;
 
     @BeforeEach
@@ -28,24 +40,30 @@ class UserServiceTest {
         dto.setFirstName("testFirstName");
         dto.setEmail("test@mail.ru");
 
-        mapper = Mockito.mock(UserInfoMapping.class);
+        UserPassword password = new UserPassword();
+        password.setPassword("test");
+
+        UserInfo user = new UserInfo();
+        user.setPassword(password);
+        user.setId(UUID.randomUUID());
+        user.setBirthDate(LocalDate.now());
+
+        //mapper
         Mockito.when(mapper.mapInfoToDto(Mockito.any())).thenReturn(dto);
-        Mockito.when(mapper.mapDtoToInfo(Mockito.any())).thenReturn(new UserInfo());
+        Mockito.when(mapper.mapDtoToInfo(Mockito.any())).thenReturn(user);
         Mockito.doNothing().when(mapper).mapDtoToInfo(Mockito.any(), Mockito.any());
 
-        checks = Mockito.mock(UserInfoChecks.class);
-        Mockito.doNothing().when(checks).checkEmail(Mockito.any());
-        Mockito.doNothing().when(checks).checkPhone(Mockito.any());
-        Mockito.doNothing().when(checks).checkBirthDate(Mockito.any());
+        //checks
+//        Mockito.doNothing().when(checks).checkEmail(Mockito.any());
+//        Mockito.doNothing().when(checks).checkPhone(Mockito.any());
+//        Mockito.doNothing().when(checks).checkBirthDate(Mockito.any());
 
-        userRepository = Mockito.mock(UserRepository.class);
-        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(new UserInfo()));
-        Mockito.when(userRepository.findByEmail(Mockito.any())).thenReturn(null);
-        Mockito.when(userRepository.findByPhoneNormalized(Mockito.any())).thenReturn(null);
-        Mockito.when(userRepository.save(Mockito.any())).thenReturn(new UserInfo());
+        //repository
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.existsByEmail(Mockito.any())).thenReturn(false);
+        Mockito.when(userRepository.existsByPhoneNormalized(Mockito.any())).thenReturn(false);
+        Mockito.when(userRepository.save(Mockito.any())).thenReturn(user);
         Mockito.doNothing().when(userRepository).delete(Mockito.any());
-
-//        userService = new UserService(userRepository, mapper, checks);
     }
 
     @Test
@@ -82,14 +100,14 @@ class UserServiceTest {
 
     @Test
     public void testCreateWithExitingEmail_expectIllegalArgument() {
-        Mockito.when(userRepository.findByEmail(Mockito.any())).thenReturn(new UserInfo());
+        Mockito.when(userRepository.existsByEmail(Mockito.any())).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> userService.createUser(null));
     }
 
     @Test
     public void testCreateWithExitingPhone_expectIllegalArgument() {
-        Mockito.when(userRepository.findByPhoneNormalized(Mockito.any())).thenReturn(new UserInfo());
+        Mockito.when(userRepository.existsByPhoneNormalized(Mockito.any())).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> userService.createUser(null));
     }

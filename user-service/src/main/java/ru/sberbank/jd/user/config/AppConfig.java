@@ -1,34 +1,45 @@
 package ru.sberbank.jd.user.config;
 
-import io.netty.channel.ChannelOption;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
-import java.time.Duration;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.client.HttpClient;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
+import ru.sberbank.jd.user.service.rest.client.AccountClient;
 
 /**
  * Configuration.
  */
+@RequiredArgsConstructor
+@Configuration
+@PropertySource("classpath:application.yml")
 public class AppConfig {
 
     @Value("${app.account.url}")
     private String accountUrl;
 
     @Bean
-    public WebClient.Builder configClient() {
-        HttpClient httpClient = reactor.netty.http.client.HttpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10_000)
-                .responseTimeout(Duration.ofMillis(10_000))
-                .doOnConnected(conn -> conn
-                        .addHandlerLast(new ReadTimeoutHandler(10))
-                        .addHandlerLast(new WriteTimeoutHandler(10)));
-
-        return WebClient.builder()
+    public RestClient.Builder configClient() {
+        return RestClient.builder()
                 .baseUrl(accountUrl)
-                .clientConnector(new ReactorClientHttpConnector(httpClient));
+                .defaultStatusHandler(HttpStatusCode::isError, (request, response) -> {
+                    throw new RuntimeException("Error during account processing: "
+                            + request.getURI() + ", ends with: "
+                            + response.getStatusCode() + " - "
+                            + response.getStatusText());
+                });
+    }
+
+    @Bean
+    public AccountClient accountClient(RestClient.Builder client) {
+        RestClient restClient = client.build();
+        RestClientAdapter adapter = RestClientAdapter.create(restClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+
+        return factory.createClient(AccountClient.class);
     }
 }
