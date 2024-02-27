@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,11 +14,14 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.jwt.Jwt;
+import ru.sberbank.api.account.service.dto.AccountDto;
 import ru.sberbank.api.user.service.dto.UserInfoDto;
 import ru.sberbank.jd.user.model.UserInfo;
 import ru.sberbank.jd.user.model.UserPassword;
 import ru.sberbank.jd.user.repository.UserRepository;
 import ru.sberbank.jd.user.service.rest.client.AccountClient;
+import ru.sberbank.jd.user.service.security.AuthService;
 
 @SpringBootTest
 class UserServiceTest {
@@ -30,6 +34,10 @@ class UserServiceTest {
     private UserRepository userRepository;
     @MockBean
     private AccountClient accountClient;
+    @MockBean
+    private AuthService authService;
+    @MockBean
+    private Jwt token;
 
     @Autowired
     private UserService userService;
@@ -53,17 +61,23 @@ class UserServiceTest {
         Mockito.when(mapper.mapDtoToInfo(Mockito.any())).thenReturn(user);
         Mockito.doNothing().when(mapper).mapDtoToInfo(Mockito.any(), Mockito.any());
 
-        //checks
-//        Mockito.doNothing().when(checks).checkEmail(Mockito.any());
-//        Mockito.doNothing().when(checks).checkPhone(Mockito.any());
-//        Mockito.doNothing().when(checks).checkBirthDate(Mockito.any());
-
         //repository
         Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
         Mockito.when(userRepository.existsByEmail(Mockito.any())).thenReturn(false);
         Mockito.when(userRepository.existsByPhoneNormalized(Mockito.any())).thenReturn(false);
-        Mockito.when(userRepository.save(Mockito.any())).thenReturn(user);
+        Mockito.when(userRepository.saveAndFlush(Mockito.any())).thenReturn(user);
         Mockito.doNothing().when(userRepository).delete(Mockito.any());
+
+        //external service
+        Mockito.when(accountClient.getAccounts(Mockito.any(), Mockito.any()))
+                .thenReturn(List.of(new AccountDto()));
+        Mockito.when(accountClient.getDeposits(Mockito.any(), Mockito.any()))
+                .thenReturn(List.of(new AccountDto()));
+
+        //auth
+        Mockito.when(authService.login(Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(token);
+        Mockito.when(token.getTokenValue()).thenReturn("");
     }
 
     @Test
@@ -84,7 +98,7 @@ class UserServiceTest {
 
     @Test
     public void testDelete() {
-        UserInfoDto dto = userService.deleteInfo(UUID.randomUUID());
+        UserInfoDto dto = userService.deleteInfo(UUID.randomUUID(), token);
 
         assertEquals("testFirstName", dto.getFirstName());
         assertEquals("test@mail.ru", dto.getEmail());

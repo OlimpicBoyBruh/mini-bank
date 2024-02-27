@@ -1,6 +1,7 @@
 package ru.sberbank.jd.user.service.rest.client;
 
 import java.util.List;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,16 +22,24 @@ import ru.sberbank.api.account.service.dto.AccountNumberDto;
 public interface AccountClient {
 
     @PostExchange(url = "/open/{type}")
-    AccountDto createAccount(@PathVariable("type") String type,
-            @RequestHeader("clientId") String clientId);
+    AccountDto createAccount(
+            @PathVariable("type") String type,
+            @RequestHeader("clientId") String clientId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token);
 
     @PutExchange(url = "/close-account")
-    AccountDto deleteAccount(@RequestBody AccountNumberDto account,
-            @RequestHeader("clientId") String clientId);
+    AccountDto deleteAccount(
+            @RequestBody AccountNumberDto account,
+            @RequestHeader("clientId") String clientId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token);
 
     @GetExchange(url = "/deposits")
-    List<AccountDto> getDeposits(@RequestHeader("clientId") String clientId);
+    List<AccountDto> getDeposits(
+            @RequestHeader("clientId") String clientId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token);
 
     @GetExchange(url = "/accounts")
-    List<AccountDto> getAccounts(@RequestHeader("clientId") String clientId);
+    List<AccountDto> getAccounts(
+            @RequestHeader("clientId") String clientId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String token);
 }

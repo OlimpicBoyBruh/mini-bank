@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -40,27 +41,32 @@ public interface UserController {
                     @ApiResponse(responseCode = "201", description = "New user registered successfully",
                             content = {@Content(schema = @Schema(implementation = UserInfoDto.class))}),
                     @ApiResponse(responseCode = "400", description = "Wrong parameters supplied",
+                            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
+                    @ApiResponse(responseCode = "500", description = "Internal server error - see message in body",
                             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
-            }
-    )
+            })
     UserInfoDto create(@Valid @RequestBody UserCreateDto dto, HttpServletResponse response);
 
     @DeleteMapping
     @Operation(summary = "Delete registered user",
-            description = "Delete registered user and closes all accounts."
+            description = "Delete registered user and closes all accounts.",
+            security = {@SecurityRequirement(name = "bearerAuth")}
     )
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "User deleted successfully",
                             content = {@Content(schema = @Schema(implementation = UserInfoDto.class))}),
                     @ApiResponse(responseCode = "404", description = "User not found",
-                            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})}
-    )
+                            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
+                    @ApiResponse(responseCode = "500", description = "Internal server error - see message in body",
+                            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
+            })
     UserInfoDto delete(@RequestParam(name = "id") UUID userId, @AuthenticationPrincipal Jwt token);
 
     @GetMapping
     @Operation(summary = "Get user information",
-            description = "Return information about registered user."
+            description = "Return information about registered user.",
+            security = {@SecurityRequirement(name = "bearerAuth")}
     )
     @ApiResponses(
             value = {
@@ -68,13 +74,13 @@ public interface UserController {
                             content = {@Content(schema = @Schema(implementation = UserInfoDto.class))}),
                     @ApiResponse(responseCode = "404", description = "User not found",
                             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
-            }
-    )
+            })
     UserInfoDto getInfo(@RequestParam(name = "id") UUID userId);
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Update registered user",
-            description = "Updates information about registered user."
+            description = "Updates information about registered user.",
+            security = {@SecurityRequirement(name = "bearerAuth")}
     )
     @ApiResponses(
             value = {
@@ -83,7 +89,7 @@ public interface UserController {
                     @ApiResponse(responseCode = "400", description = "Wrong parameters supplied",
                             content = {@Content(schema = @Schema(implementation = ErrorResponse.class))}),
                     @ApiResponse(responseCode = "404", description = "User not found",
-                            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})}
-    )
+                            content = {@Content(schema = @Schema(implementation = ErrorResponse.class))})
+            })
     UserInfoDto update(@Valid @RequestParam(name = "id") UUID userId, @RequestBody UserUpdateDto userInfo);
 }

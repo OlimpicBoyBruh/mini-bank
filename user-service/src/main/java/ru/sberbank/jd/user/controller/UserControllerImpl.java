@@ -28,7 +28,7 @@ public class UserControllerImpl implements UserController {
 
     @Override
     public UserInfoDto delete(UUID userId, Jwt token) {
-        return userService.deleteInfo(userId);
+        return userService.deleteInfo(userId, token);
     }
 
     @Override

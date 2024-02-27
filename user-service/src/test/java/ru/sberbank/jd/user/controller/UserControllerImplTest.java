@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,8 +27,11 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.sberbank.api.user.service.dto.UserInfoDto;
+import ru.sberbank.jd.user.model.UserInfo;
+import ru.sberbank.jd.user.model.UserPassword;
 import ru.sberbank.jd.user.repository.UserRepository;
 import ru.sberbank.jd.user.service.UserService;
+import ru.sberbank.jd.user.service.security.CustomUserDetails;
 
 @SpringBootTest
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class,
@@ -36,17 +40,24 @@ import ru.sberbank.jd.user.service.UserService;
 @AutoConfigureMockMvc
 class UserControllerImplTest {
 
+    private static UUID testId;
     @Autowired
     private MockMvc mvc;
     @Autowired
     private UserControllerImpl controller;
-
     @MockBean
     private UserService service;
     @MockBean
     private JwtDecoder jwtDecoder;
     @MockBean
     private UserRepository userRepository;
+    @MockBean
+    private CustomUserDetails user;
+
+    @BeforeAll
+    public static void init() {
+        testId = UUID.randomUUID();
+    }
 
     @BeforeEach
     public void setUp() {
@@ -55,9 +66,20 @@ class UserControllerImplTest {
         dto.setFirstName("testFirstName");
 
         Mockito.when(service.createUser(Mockito.any())).thenReturn(dto);
-        Mockito.when(service.deleteInfo(Mockito.any())).thenReturn(dto);
+        Mockito.when(service.deleteInfo(Mockito.any(), Mockito.any())).thenReturn(dto);
         Mockito.when(service.getInfo(Mockito.any())).thenReturn(dto);
         Mockito.when(service.updateInfo(Mockito.any(), Mockito.any())).thenReturn(dto);
+
+        Mockito.when(user.getUsername()).thenReturn(testId.toString());
+
+        UserPassword password = new UserPassword();
+        password.setPassword("test");
+        UserInfo user = new UserInfo();
+        user.setId(testId);
+        user.setEmail("test@test.ru");
+        user.setPassword(password);
+
+        Mockito.when(userRepository.findByEmail(Mockito.any())).thenReturn(user);
     }
 
     @Test
@@ -89,8 +111,12 @@ class UserControllerImplTest {
     @Test
     public void testDelete() throws Exception {
         mvc.perform(delete("/user")
-                        .with(SecurityMockMvcRequestPostProcessors.jwt())
-                        .queryParam("id", UUID.randomUUID().toString())
+                        .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt
+                                .subject(testId.toString())
+                                .issuer("user-service")
+                                .claim("scope", "USER")
+                                .build()))
+                        .queryParam("id", testId.toString())
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
@@ -98,8 +124,12 @@ class UserControllerImplTest {
     @Test
     public void testGet() throws Exception {
         mvc.perform(get("/user")
-                        .with(SecurityMockMvcRequestPostProcessors.jwt())
-                        .queryParam("id", UUID.randomUUID().toString())
+                        .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt
+                                .subject(testId.toString())
+                                .issuer("user-service")
+                                .claim("scope", "USER")
+                                .build()))
+                        .queryParam("id", testId.toString())
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk());
     }
@@ -109,8 +139,12 @@ class UserControllerImplTest {
         Mockito.when(service.getInfo(Mockito.any())).thenThrow(NoSuchElementException.class);
 
         mvc.perform(get("/user")
-                        .with(SecurityMockMvcRequestPostProcessors.jwt())
-                        .queryParam("id", UUID.randomUUID().toString())
+                        .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt
+                                .subject(testId.toString())
+                                .issuer("user-service")
+                                .claim("scope", "USER")
+                                .build()))
+                        .queryParam("id", testId.toString())
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNotFound());
     }
@@ -118,9 +152,13 @@ class UserControllerImplTest {
     @Test
     public void testUpdate() throws Exception {
         mvc.perform(put("/user")
-                        .with(SecurityMockMvcRequestPostProcessors.jwt())
+                        .with(SecurityMockMvcRequestPostProcessors.jwt().jwt(jwt -> jwt
+                                .subject(testId.toString())
+                                .issuer("user-service")
+                                .claim("scope", "USER")
+                                .build()))
+                        .queryParam("id", testId.toString())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .queryParam("id", UUID.randomUUID().toString())
                         .content("{"
                                 + "\"lastName\": \"test\","
                                 + "\"email\": \"1@1.ru\","
