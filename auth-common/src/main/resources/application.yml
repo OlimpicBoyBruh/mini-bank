@@ -1,0 +1,2 @@
+keys:
+  publicKey: "classpath:keys/public.key"

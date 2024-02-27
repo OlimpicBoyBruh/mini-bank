@@ -97,6 +97,7 @@
         <module>account-service</module>
         <module>operation-service</module>
         <module>user-service-api</module>
+        <module>auth-common</module>
     </modules>
     <name>miniBank-JD-1023</name>
 
