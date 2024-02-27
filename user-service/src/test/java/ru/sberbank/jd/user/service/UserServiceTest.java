@@ -115,6 +115,8 @@ class UserServiceTest {
     @Test
     public void testCreateWithExitingEmail_expectIllegalArgument() {
         Mockito.when(userRepository.existsByEmail(Mockito.any())).thenReturn(true);
+        Mockito.when(userRepository.existsByEmailAndIdNot(Mockito.any(), Mockito.any()))
+                        .thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> userService.createUser(null));
     }
@@ -122,6 +124,8 @@ class UserServiceTest {
     @Test
     public void testCreateWithExitingPhone_expectIllegalArgument() {
         Mockito.when(userRepository.existsByPhoneNormalized(Mockito.any())).thenReturn(true);
+        Mockito.when(userRepository.existsByPhoneNormalizedAndIdNot(Mockito.any(), Mockito.any()))
+                .thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> userService.createUser(null));
     }
