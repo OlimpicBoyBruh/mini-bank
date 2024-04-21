@@ -8,6 +8,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import ru.sberbank.api.account.service.Status;
@@ -17,8 +19,7 @@ import ru.sberbank.api.account.service.Type;
  * Entity объект Бд account_client.
  */
 @Entity
-@Setter
-@Getter
+@Data
 public class AccountClient {
 
     @Id

@@ -3,7 +3,6 @@
 target
 
 *.iml
-*.key
 
 .DS_Store
 *reduced-pom.xml

@@ -9,8 +9,6 @@ import ru.sberbank.api.account.service.dto.AccountNumberDto;
 import ru.sberbank.api.account.service.dto.ChangeBalanceDto;
 import ru.sberbank.jd.entity.AccountClient;
 import ru.sberbank.jd.service.AccountClientService;
-import ru.sberbank.jd.service.AccountTypeService;
-
 import java.util.List;
 
 /**
@@ -22,7 +20,6 @@ import java.util.List;
 public class ProfileController {
 
     private AccountClientService clientService;
-    private AccountTypeService accountService;
 
     /**
      * Отображает все счета клиента. Запрос клиента передается header clientId.
@@ -107,10 +104,11 @@ public class ProfileController {
     )
     @PutMapping("/close-account")
     public AccountClientDto closeAccountClient(@RequestBody AccountNumberDto accountNumber,
-                                            @RequestHeader("clientId") String clientId) {
-       return clientService.closedAccount(accountNumber.getAccountNumber(), clientId);
+                                               @RequestHeader("clientId") String clientId) {
+        return clientService.closedAccount(accountNumber.getAccountNumber(), clientId);
 
     }
+
     @GetMapping("/bank-account")
     public AccountClientDto getBankAccount() {
         return clientService.getBankAccount();

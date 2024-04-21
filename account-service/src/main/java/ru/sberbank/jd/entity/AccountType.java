@@ -7,6 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.List;
+
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import ru.sberbank.api.account.service.Type;
@@ -15,8 +17,7 @@ import ru.sberbank.api.account.service.Type;
  * Entity объект Бд account_type.
  */
 @Entity
-@Getter
-@Setter
+@Data
 public class AccountType {
 
     @Id

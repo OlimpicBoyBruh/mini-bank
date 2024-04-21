@@ -6,17 +6,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
+
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.sberbank.api.account.service.dto.AccountClientDto;
 import ru.sberbank.api.account.service.dto.AccountDto;
-import ru.sberbank.api.account.service.dto.AccountTypeDto;
 import ru.sberbank.jd.entity.AccountClient;
 import ru.sberbank.jd.entity.AccountType;
 import ru.sberbank.api.account.service.Status;
 import ru.sberbank.api.account.service.Type;
+import ru.sberbank.jd.model.DtoConverter;
 import ru.sberbank.jd.repository.AccountClientRepository;
 
 /**
@@ -46,12 +48,10 @@ public class AccountClientService {
      */
     public List<AccountClientDto> getAccounts(String clientId) {
         List<AccountClient> accountClients = clientRepository.getClientAccounts(clientId);
-        List<AccountClientDto> accountClientDtos = new ArrayList<>();
-        for (AccountClient accountClient : accountClients) {
-            AccountClientDto accountClientDto = of(accountClient);
-            accountClientDtos.add(accountClientDto);
-        }
-        return accountClientDtos;
+
+        return accountClients.stream()
+                .map(DtoConverter::of)
+                .collect(Collectors.toList());
     }
 
     public AccountClient findByNumberAccount(String accountNumber) {
@@ -74,14 +74,9 @@ public class AccountClientService {
 
     public List<AccountClientDto> getDeposits(String clientId) {
         List<AccountClient> accountClients = clientRepository.getClientDeposits(clientId);
-        List<AccountClientDto> accountClientDtos = new ArrayList<>();
-
-        for (AccountClient accountClient : accountClients) {
-            AccountClientDto accountClientDto = of(accountClient);
-            accountClientDtos.add(accountClientDto);
-        }
-
-        return accountClientDtos;
+        return accountClients.stream()
+                .map(DtoConverter::of)
+                .collect(Collectors.toList());
     }
 
     public AccountClient openAccount(String clientId, String accountId) {
@@ -117,11 +112,11 @@ public class AccountClientService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Для закрытия счета, баланс должен быть равен 0");
         }
         clientRepository.closeAccount(LocalDateTime.now(), accountNumber);
-        return of(findByNumberAccount(accountNumber));
+        return DtoConverter.of(findByNumberAccount(accountNumber));
     }
 
     public AccountClientDto getBankAccount() {
-        return of(clientRepository.getBankAccount());
+        return DtoConverter.of(clientRepository.getBankAccount());
     }
 
     private AccountClient createAccount(String clientId, String accountId) {
@@ -139,22 +134,11 @@ public class AccountClientService {
         accountClient.setAccountType(accountType);
         return accountClient;
     }
-    public AccountClientDto of(AccountClient accountClient) {
-        AccountTypeDto accountTypeDto = of(accountClient.getAccountType());
-        return new AccountClientDto(accountClient.getNumberAccount(), accountClient.getIdClient(),
-                accountClient.getBalance(), accountClient.getOpeningDate(),
-                accountClient.getClosedDate(), accountClient.getStatus(),
-                accountClient.getType(), accountTypeDto);
-    }
-    public AccountTypeDto of(AccountType accountType) {
-        return new AccountTypeDto(accountType.getAccountId(), accountType.getAccountName(),
-                accountType.getInterestRate(), accountType.isReplenishmentOption(),
-                accountType.isWithdrawalOption(), accountType.getType());
-    }
+
     public double roundTwoDecimals(double d) {
         DecimalFormat twoDForm = new DecimalFormat("#.##");
         String formattedNumber = twoDForm.format(d).replace(",", ".");
-        return Double.valueOf(formattedNumber);
+        return Double.parseDouble(formattedNumber);
     }
 
     private String generateNumberAccount() {
